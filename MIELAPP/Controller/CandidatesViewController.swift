@@ -34,11 +34,15 @@ final class CandidatesViewController: UIViewController {
     private let filterButton = UIButton(type: .system)
     private var quotasCount: Int = 0
     private var invitationsCount: Int = 0
+    private var allCandidates: [CandidateInfo] = []
+      
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("CandidatesViewController открыт")
-        
+        filterButton.addTarget(self, action: #selector(showFilterScreen), for: .touchUpInside)
+
+
         view.backgroundColor = .white
         
         // 1. Проверяем токен ДО вызова сетевых методов
@@ -75,17 +79,39 @@ final class CandidatesViewController: UIViewController {
         SupervisorHelper.fetch(headerView: headerView)
     }
 
-    @objc private func sortCandidatesBySurname() {
-        isSortedAlphabetically.toggle()
-        if isSortedAlphabetically {
-            candidates.sort { ($0.surname ) < ($1.surname ) }
-            filterButton.setTitle("А-Я", for: .normal) // Меняешь текст или иконку — по желанию
-        } else {
-            fetchCandidates() // Сбросить сортировку, вернуть исходный список с сервера
-            filterButton.setTitle("Фильтр", for: .normal)
+    // Показываем экран фильтра:
+    @objc private func showFilterScreen() {
+        let filterVC = CandidateFilterViewController()
+        filterVC.delegate = self
+        filterVC.modalPresentationStyle = .formSheet // Можно .automatic или .overFullScreen, если хочешь
+        present(filterVC, animated: true)
+    }
+    
+    private func applyLocalFilter(ageMin: Int?, ageMax: Int?, courses: [String], byNew: String?) {
+        var filtered = allCandidates // allCandidates: [CandidateInfo]
+        if let ageMin = ageMin {
+            filtered = filtered.filter { $0.age >= ageMin }
         }
+        if let ageMax = ageMax {
+            filtered = filtered.filter { $0.age <= ageMax }
+        }
+        if !courses.isEmpty {
+            filtered = filtered.filter { candidate in
+                let candidateCourseNames = candidate.courses.map { $0.name }
+                return courses.contains(where: { candidateCourseNames.contains($0) })
+            }
+        }
+        if byNew == "true" {
+            filtered = filtered.sorted { $0.updatedAt > $1.updatedAt }
+        } else if byNew == "false" {
+            filtered = filtered.sorted { $0.updatedAt < $1.updatedAt }
+        }
+        self.candidates = filtered
         tableView.reloadData()
     }
+
+
+
     private func setupChatButton() {
         chatButton.setTitle("Чат с админом", for: .normal)
         chatButton.addTarget(self, action: #selector(openChatLink), for: .touchUpInside)
@@ -137,6 +163,8 @@ final class CandidatesViewController: UIViewController {
             }))
             alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
             self.present(alert, animated: true)
+           
+
         }
     }
     
@@ -350,7 +378,8 @@ final class CandidatesViewController: UIViewController {
                             achivmentDeals: r.achivment_deals
                         )
                     }
-                    self.candidates = infos
+                    self.allCandidates = infos      // <--- ВАЖНО: сохраняем полный массив!
+                    self.candidates = infos         // Отображаемые (может быть отфильтровано)
                     self.tableView.reloadData()
                 } catch {
                     print("Decode raw error:", error)
@@ -359,6 +388,7 @@ final class CandidatesViewController: UIViewController {
             }
         }.resume()
     }
+
     func openContactLink(for candidateId: Int) {
         getCandidateLink(candidateId: candidateId) { [weak self] result in
             DispatchQueue.main.async {
@@ -633,3 +663,29 @@ final class CandidatesViewController: UIViewController {
     }
 
 
+extension CandidatesViewController: CandidateFilterDelegate {
+    func didApplyFilter(ageMin: Int?, ageMax: Int?, courses: [String], byNew: String?) {
+        var filtered = allCandidates
+
+        if let ageMin = ageMin {
+            filtered = filtered.filter { $0.age >= ageMin }
+        }
+        if let ageMax = ageMax {
+            filtered = filtered.filter { $0.age <= ageMax }
+        }
+        if !courses.isEmpty {
+            filtered = filtered.filter { candidate in
+                let candidateCourseNames = candidate.courses.map { $0.name }
+                return courses.contains(where: { candidateCourseNames.contains($0) })
+            }
+        }
+        if byNew == "true" {
+            filtered = filtered.sorted { $0.updatedAt > $1.updatedAt }
+        } else if byNew == "false" {
+            filtered = filtered.sorted { $0.updatedAt < $1.updatedAt }
+        }
+
+        self.candidates = filtered
+        tableView.reloadData()
+    }
+}

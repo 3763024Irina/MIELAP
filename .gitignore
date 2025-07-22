@@ -2,13 +2,8 @@
 build/
 *.xcworkspace
 DerivedData/
-xcuserdata/
-*.xcuserdatad/*
-*.xcscmblueprint
+*.xcuserstate
 
 # CocoaPods
 Pods/
 Podfile.lock
-
-# User settings
-*.xcuserstate

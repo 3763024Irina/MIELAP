@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8C0805372E2FB52F002E93BA /* APIServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7AFDD02E2EC288007BC76C /* APIServiceTests.swift */; };
 		8C0805392E2FCECF002E93BA /* GreetingControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */; };
+		8C0C6BF52E302E5E003703A0 /* CandidateFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0C6BF42E302E5E003703A0 /* CandidateFilterViewController.swift */; };
 		8C3A23392E22AA3600A21B8A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23382E22AA3600A21B8A /* AppDelegate.swift */; };
 		8C3A233B2E22AA3600A21B8A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A233A2E22AA3600A21B8A /* SceneDelegate.swift */; };
 		8C3A23432E22AA3600A21B8A /* MIELAPP.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23412E22AA3600A21B8A /* MIELAPP.xcdatamodeld */; };
@@ -60,6 +61,7 @@
 		4EC1FA5D9C0F73F99FD0AC18 /* Pods-MIELAPP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIELAPP.release.xcconfig"; path = "Target Support Files/Pods-MIELAPP/Pods-MIELAPP.release.xcconfig"; sourceTree = "<group>"; };
 		74A130189F55DFC653764CDD /* Pods-MIELAPP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIELAPP.debug.xcconfig"; path = "Target Support Files/Pods-MIELAPP/Pods-MIELAPP.debug.xcconfig"; sourceTree = "<group>"; };
 		8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingControllerView.swift; sourceTree = "<group>"; };
+		8C0C6BF42E302E5E003703A0 /* CandidateFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateFilterViewController.swift; sourceTree = "<group>"; };
 		8C3A23352E22AA3600A21B8A /* MIELAPP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MIELAPP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3A23382E22AA3600A21B8A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3A233A2E22AA3600A21B8A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 				8C3A23772E22FE4800A21B8A /* LoginViewController.swift */,
 				8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */,
 				8C3A236F2E22FCE700A21B8A /* CandidatesViewController.swift */,
+				8C0C6BF42E302E5E003703A0 /* CandidateFilterViewController.swift */,
 				8C3A23712E22FCFE00A21B8A /* FavoritesViewController.swift */,
 				8C9891A02E23A86C00585415 /* CandidateCell.swift */,
 				8C9891952E23119000585415 /* MainTabBarController.swift */,
@@ -422,6 +425,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C0C6BF52E302E5E003703A0 /* CandidateFilterViewController.swift in Sources */,
 				8C3A23782E22FE4800A21B8A /* LoginViewController.swift in Sources */,
 				8C3A23702E22FCE700A21B8A /* CandidatesViewController.swift in Sources */,
 				8C9891962E23119000585415 /* MainTabBarController.swift in Sources */,

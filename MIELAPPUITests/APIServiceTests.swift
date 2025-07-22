@@ -4,7 +4,7 @@ import OpenAPIClient
 final class APIServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
-        // Установи basePath и токен авторизации для тестов
+        // basePath и токен авторизации для тестов
         OpenAPIClientAPI.basePath = "https://miel.sayrrx.cfd"
         OpenAPIClientAPI.customHeaders["Authorization"] = "Token 7d2898dbe35b33670224c24ed43ff73b676bc6cc"
     }
