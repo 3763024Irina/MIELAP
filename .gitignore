@@ -1,0 +1,14 @@
+# Xcode
+build/
+*.xcworkspace
+DerivedData/
+xcuserdata/
+*.xcuserdatad/*
+*.xcscmblueprint
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# User settings
+*.xcuserstate

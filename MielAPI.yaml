@@ -1,0 +1,3249 @@
+openapi: 3.0.3
+info:
+  title: Miel API
+  version: 1.0.0
+  description: API для управления кандидатами, руководителями и статистикой. Позволяет
+    выполнять операции с задачами, приглашениями, транзакциями, а также получать статистику
+    по различным данным.
+paths:
+  /api/admin/archive/:
+    get:
+      operationId: api_admin_archive_list
+      description: Возвращает список архивированных кандидатов. Кандидаты фильтруются
+        по датам обновления в зависимости от параметров запроса 'start_date' и 'end_date'.
+      summary: Получение информации о архивных кандидатах
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: Дата конца фильтрации по дате обновления (в формате YYYY-MM-DD).
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Дата начала фильтрации по дате обновления (в формате YYYY-MM-DD).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArchiveCandidate'
+              examples:
+                ПримерАрхиваКандидатов:
+                  value:
+                  - - id: 1
+                      full_name: Ivan Ivanov
+                      email: ivan@example.com
+                      phone: '+123456789'
+                      updated_at: '2023-12-15T10:00:00Z'
+                    - id: 2
+                      full_name: Anna Petrovna
+                      email: anna@example.com
+                      phone: '+987654321'
+                      updated_at: '2023-12-10T14:00:00Z'
+                  summary: Пример архива кандидатов
+          description: Список архивных кандидатов
+        '400':
+          content:
+            application/json:
+              schema:
+                detail: Некорректный формат даты!
+          description: Ошибка формата даты
+  /api/admin/archive/restore/:
+    post:
+      operationId: api_admin_archive_restore_create
+      description: Позволяет восстановить кандидатов из архива. Требуется передать
+        список ID кандидатов, разделённых запятой, в теле запроса. Если ID кандидатов
+        некорректны, будет возвращена ошибка.
+      summary: Восстановление архивированных кандидатов
+      parameters:
+      - in: query
+        name: candidate_ids
+        schema:
+          type: string
+        description: 'Строка с ID кандидатов, разделённая запятой. Например: ''1,
+          2, 3''.'
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                detail: Статус операции
+              examples:
+                ПримерОтвета(успех):
+                  value:
+                    detail: 'Восстановлено кандидатов: 1'
+                  summary: Пример ответа (успех)
+          description: Успешное восстановление кандидатов из архива
+        '400':
+          content:
+            application/json:
+              schema:
+                detail: Ошибка операции
+              examples:
+                ПримерОтвета(ошибка):
+                  value:
+                    detail: Не переданы корректные ID кандидатов.
+                  summary: Пример ответа (ошибка)
+          description: Ошибка при восстановлении кандидатов
+  /api/admin/candidates/:
+    get:
+      operationId: api_admin_candidates_list
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+    post:
+      operationId: api_admin_candidates_create
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+  /api/admin/candidates/{candidate_id}/invitations/{invitation_id}/:
+    patch:
+      operationId: api_admin_candidates_invitations_partial_update
+      description: |-
+        Позволяет обновить статус конкретного приглашения кандидата.
+         Поддерживаемые статусы: 'accepted', 'invited', 'rejected', 'self_rejected'.в случае, если передан accepted все остальные приглашения кандидата будут отклонены
+      summary: Обновление статуса приглашения
+      parameters:
+      - in: path
+        name: candidate_id
+        schema:
+          type: integer
+        description: Идентификатор кандидата
+        required: true
+      - in: path
+        name: invitation_id
+        schema:
+          type: integer
+        description: Идентификатор приглашения
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              status: accepted | invited | rejected
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                detail: str
+              examples:
+                УспешноеОбновлениеСтатуса:
+                  value:
+                    detail: Статус приглашения обновлён.
+                  summary: Успешное обновление статуса
+          description: Успешное обновление статуса.
+        '400':
+          content:
+            application/json:
+              schema:
+                detail: str
+              examples:
+                ОшибкаВалидации:
+                  value:
+                    detail: Поле 'status' обязательно!
+                  summary: Ошибка валидации
+          description: Ошибка валидации или неподдерживаемый статус.
+        '404':
+          content:
+            application/json:
+              schema:
+                detail: str
+              examples:
+                ПриглашениеНеНайдено:
+                  value:
+                    detail: Приглашение не найдено!
+                  summary: Приглашение не найдено
+          description: Приглашение или кандидат не найдены.
+  /api/admin/candidates/{id}/invitations/:
+    get:
+      operationId: api_admin_candidates_invitations_retrieve
+      description: Возвращает список приглашений, связанных с указанным кандидатом.
+        Требует идентификатор кандидата в URL.
+      summary: Получение приглашений кандидата
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Идентификатор кандидата
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminInvitation'
+              examples:
+                УспешныйОтвет:
+                  value:
+                  - - id: 1
+                      candidate: 123
+                      status: invited
+                      created_at: '2025-01-23T12:34:56Z'
+                      updated_at: '2025-01-23T15:12:30Z'
+                    - id: 2
+                      candidate: 123
+                      status: accepted
+                      created_at: '2025-01-20T10:10:10Z'
+                      updated_at: '2025-01-21T14:00:00Z'
+                  summary: Успешный ответ
+          description: Успешный ответ с приглашениями кандидата.
+        '404':
+          content:
+            application/json:
+              schema:
+                detail: Кандидат не найден!
+              examples:
+                КандидатНеНайден:
+                  value:
+                    detail: Кандидат не найден!
+                  summary: Кандидат не найден
+          description: 'Ошибка: Кандидат не найден.'
+  /api/admin/candidates/{id}/:
+    get:
+      operationId: api_admin_candidates_list_2
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Кандидат.
+        required: true
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+    put:
+      operationId: api_admin_candidates_update
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Кандидат.
+        required: true
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+    patch:
+      operationId: api_admin_candidates_partial_update
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Кандидат.
+        required: true
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCandidate'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+    delete:
+      operationId: api_admin_candidates_destroy
+      description: Возвращает список кандидатов с возможностью фильтрации по состоянию
+        и имени.
+      summary: Список кандидатов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Кандидат.
+        required: true
+      - in: query
+        name: is_free
+        schema:
+          type: string
+        description: 'Фильтрация кандидатов по состоянию: свободен (true/false).'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск кандидатов по имени (регистронезависимый).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+          description: ''
+  /api/admin/offices/:
+    get:
+      operationId: api_admin_offices_list
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Office'
+          description: ''
+    post:
+      operationId: api_admin_offices_create
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Office'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Office'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Office'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Office'
+          description: ''
+  /api/admin/offices/{id}/:
+    get:
+      operationId: api_admin_offices_retrieve
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Офис.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Office'
+          description: ''
+    put:
+      operationId: api_admin_offices_update
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Офис.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Office'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Office'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Office'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Office'
+          description: ''
+    patch:
+      operationId: api_admin_offices_partial_update
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Офис.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOffice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOffice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOffice'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Office'
+          description: ''
+    delete:
+      operationId: api_admin_offices_destroy
+      description: Возвращает список офисов с возможностью фильтрации по имени. Используйте
+        параметр `search` для поиска.
+      summary: Получить список офисов
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Офис.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Фильтр по названию офиса (регистронезависимый поиск).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/quotas/update/:
+    post:
+      operationId: api_admin_quotas_update_create
+      description: Позволяет администратору изменить квоты нескольких офисов сразу.
+        Если новое значение квоты больше текущего, происходит увеличение, если меньше
+        — уменьшение. Для каждой операции создается транзакция.
+      summary: Массовое обновление квот офисов
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                quotas:
+                - office_id: 1
+                  amount: 10
+                - office_id: 2
+                  amount: 5
+            examples:
+              ПримерЗапроса:
+                value:
+                  quotas:
+                  - office_id: 1
+                    amount: 10
+                  - office_id: 2
+                    amount: 5
+                summary: Пример запроса
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          description: Квоты успешно обновлены.
+        '400':
+          description: Ошибка валидации данных.
+        '403':
+          description: Нет прав доступа.
+  /api/admin/requests/:
+    get:
+      operationId: api_admin_requests_list
+      description: Возвращает список квот со статусом `waited`. Доступно только администраторам.
+      summary: Получить список запросов на квоты
+      tags:
+      - Quota Requests
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuotaRequest'
+          description: ''
+    post:
+      operationId: api_admin_requests_create
+      description: Создаёт новый запрос на квоту. Требуются данные о офисе и сумме.
+      summary: Создать новый запрос на квоту
+      tags:
+      - Quota Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaRequest'
+          description: ''
+        '400':
+          description: Ошибка валидации данных
+  /api/admin/requests/{id}/:
+    get:
+      operationId: api_admin_requests_retrieve
+      description: Возвращает детальную информацию о запросе на квоту по его ID.
+      summary: Получить информацию о конкретном запросе на квоту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Запрос.
+        required: true
+      tags:
+      - Quota Requests
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaRequest'
+          description: ''
+    put:
+      operationId: api_admin_requests_update
+      description: Полностью обновляет данные запроса на квоту по его ID.
+      summary: Обновить данные запроса на квоту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Запрос.
+        required: true
+      tags:
+      - Quota Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuotaRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaRequest'
+          description: ''
+        '400':
+          description: Ошибка валидации данных
+    patch:
+      operationId: api_admin_requests_partial_update
+      description: Позволяет обновить отдельные поля запроса на квоту.
+      summary: Частично обновить запрос на квоту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Запрос.
+        required: true
+      tags:
+      - Quota Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotaRequest'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaRequest'
+          description: ''
+        '400':
+          description: Ошибка валидации данных
+    delete:
+      operationId: api_admin_requests_destroy
+      description: Удаляет запрос на квоту по его ID.
+      summary: Удалить запрос на квоту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Запрос.
+        required: true
+      tags:
+      - Quota Requests
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '204':
+          description: Запрос успешно удалён
+  /api/admin/requests/{id}/details/:
+    get:
+      operationId: api_admin_requests_details_retrieve
+      description: Возвращает детальную информацию о конкретной квоте, включая историю
+        последних 5 запросов.
+      summary: Получить детальную информацию о квоте
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Запрос.
+        required: true
+      tags:
+      - Quota Requests
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaRequestDetail'
+              examples:
+                ПримерОтвета:
+                  value:
+                    id: 1
+                    office_info:
+                      id: 3
+                      name: Офис №3
+                    history:
+                    - id: 10
+                      amount: 500
+                      status: accepted
+                      created_at: '2024-02-01T12:00:00Z'
+                    - id: 11
+                      amount: 700
+                      status: waited
+                      created_at: '2024-02-05T15:30:00Z'
+                  summary: Пример ответа
+          description: Детальная информация успешно получена.
+        '404':
+          content:
+            application/json:
+              schema:
+                detail: Квота не найдена.
+          description: Ошибка, если квота с указанным ID не существует.
+  /api/admin/statistic/invitations/:
+    get:
+      operationId: api_admin_statistic_invitations_list
+      description: Позволяет получить статистику по приглашениям с фильтрацией по
+        диапазону дат.
+      summary: Статистика приглашений
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+        description: Конечная дата в формате YYYY-MM-DDTHH:MM:SSZ.
+      - in: query
+        name: office_id
+        schema:
+          type: string
+        description: id фильтруемого оффиса
+      - in: query
+        name: start_date
+        schema:
+          type: string
+        description: Начальная дата в формате YYYY-MM-DDTHH:MM:SSZ.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvitationStatistics'
+          description: ''
+  /api/admin/statistic/quotas/:
+    get:
+      operationId: api_admin_statistic_quotas_retrieve
+      description: Возвращает статистику по транзакциям и приглашениям по месяцам
+        за указанный год. Если год не указан, возвращаются данные за последние 10
+        месяцев.
+      summary: Получение статистики по месяцам для администратора
+      parameters:
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Год, за который необходимо получить статистику. По умолчанию
+          10 последних месяцев.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                month: str
+                issued: int
+                subtracted: int
+                invited: int
+                accepted: int
+                rejected: int
+              examples:
+                ПримерСтатистикиЗа2023Год:
+                  value:
+                  - month: Январь 2023
+                    issued: 50
+                    subtracted: 20
+                    invited: 30
+                    accepted: 15
+                    rejected: 5
+                  - month: Февраль 2023
+                    issued: 60
+                    subtracted: 25
+                    invited: 40
+                    accepted: 20
+                    rejected: 10
+                  summary: Пример статистики за 2023 год
+          description: Успешное получение статистики
+        '400':
+          content:
+            application/json:
+              schema:
+                detail: Некорректный формат года!
+          description: Ошибка формата года
+  /api/admin/supervisors/:
+    get:
+      operationId: api_admin_supervisors_list
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+    post:
+      operationId: api_admin_supervisors_create
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+  /api/admin/supervisors/{id}/:
+    get:
+      operationId: api_admin_supervisors_list_2
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Руководитель.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+    put:
+      operationId: api_admin_supervisors_update
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Руководитель.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Supervisor'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+    patch:
+      operationId: api_admin_supervisors_partial_update
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Руководитель.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSupervisor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSupervisor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSupervisor'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+    delete:
+      operationId: api_admin_supervisors_destroy
+      description: Возвращает список супервайзеров, с возможностью фильтрации по имени,
+        фамилии и отчеству.
+      summary: Список супервайзеров
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Руководитель.
+        required: true
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по имени, фамилии или отчество пользователя.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor'
+          description: ''
+  /api/info/:
+    get:
+      operationId: api_info_retrieve
+      description: Возвращает информацию о пользователе в зависимости от его роли.
+        Если пользователь администратор, возвращаются данные об администраторе. Если
+        супервайзер, возвращаются данные о супервайзере. Иначе ошибка.
+      summary: Получение полной информации о пользователе
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                admin:
+                  role: int
+                  full_name: str
+                  photo: str (nullable)
+                  email: str
+                  phone: str
+                supervisor:
+                  role: int
+                  full_name: str
+                  email: str
+                  phone: str
+                  photo: str (nullable)
+                  office_name: str
+                  office_location: str
+                  department: str
+                  office_quota: int
+                  office_used_quota: int
+              examples:
+                ОтветДляАдминистратора:
+                  value:
+                    role: 1
+                    full_name: Admin User
+                    photo: null
+                    email: admin@example.com
+                    phone: '+123456789'
+                  summary: Ответ для администратора
+                ОтветДляСупервайзера:
+                  value:
+                    role: 2
+                    full_name: Supervisor User
+                    email: supervisor@example.com
+                    phone: '+987654321'
+                    photo: https://example.com/photo.jpg
+                    office_name: Main Office
+                    office_location: 123 Main St.
+                    department: Real Estate
+                    office_quota: 15
+                    office_used_quota: 7
+                  summary: Ответ для супервайзера
+          description: Успешное получение данных о пользователе
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ОтветСОшибкой:
+                  value:
+                    error: The user is not a member of staff.
+                  summary: Ответ с ошибкой
+          description: Пользователь не является членом команды
+  /api/link/:
+    get:
+      operationId: api_link_retrieve
+      description: Метод GET позволяет получить текущую ссылку чата на чат с администратором
+      summary: Получение ссылки чата
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                link: https://example.com/chat
+              examples:
+                ПримерОтветаGET:
+                  value:
+                    link: https://example.com/chat
+                  summary: Пример ответа GET
+          description: Успешное получение ссылки
+        '404':
+          content:
+            application/json:
+              schema:
+                detail: ссылка не найдена
+          description: Если ссылка не найдена
+    post:
+      operationId: api_link_create
+      description: Метод POST позволяет администраторам обновить ссылку чата для платформы
+        'telegram' или 'whatsapp'. Ссылка должна быть валидной (начинаться с 'https').
+      summary: Обновление ссылки чата
+      parameters:
+      - in: query
+        name: link
+        schema:
+          type: string
+        description: Ссылка на чат, должна начинаться с 'https'
+        required: true
+      - in: query
+        name: platform
+        schema:
+          type: string
+        description: 'Платформа чата, доступные значения: ''telegram'', ''whatsapp'''
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                detail: https://example.com/chat
+              examples:
+                ПримерУспешногоОтветаPOST:
+                  value:
+                    detail: Ссылка успешно обновлена.
+                  summary: Пример успешного ответа POST
+          description: Успешное обновление ссылки
+        '400':
+          content:
+            application/json:
+              schema:
+                detail: error message
+              examples:
+                ПримерОшибки(неправильнаяПлатформа):
+                  value:
+                    detail: platform is invalid ( only 'telegram' or 'whatsapp')
+                  summary: Пример ошибки (неправильная платформа)
+                ПримерОшибки(неправильныйФорматСсылки):
+                  value:
+                    detail: Ссылка должна начинаться с 'https'.
+                  summary: Пример ошибки (неправильный формат ссылки)
+          description: Ошибка валидации данных (неверный формат ссылки или отсутствует
+            платформа)
+        '403':
+          content:
+            application/json:
+              schema:
+                detail: you are not an admin
+              examples:
+                ПримерОшибки(неавторизованныйДоступ):
+                  value:
+                    detail: Только администраторы могут редактировать.
+                  summary: Пример ошибки (неавторизованный доступ)
+          description: Ошибка прав доступа, доступно только администраторам
+  /api/login/:
+    post:
+      operationId: api_login_create
+      description: Позволяет пользователю авторизоваться, предоставив имя пользователя
+        и пароль. Возвращает токен доступа, если учетные данные верны.полученный токен
+        нужно передавать в headers в поле Authorization в формате Token <token>
+      summary: Авторизация пользователя
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              username: str
+              password: str
+            examples:
+              УспешныйЗапрос:
+                value:
+                  username: testuser
+                  password: testpassword
+                summary: Успешный запрос
+      security:
+      - tokenAuth: []
+      - Token: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                token: str
+              examples:
+                УспешныйОтвет:
+                  value:
+                    token: abc123xyz456
+                  summary: Успешный ответ
+          description: Успешная авторизация. Возвращается токен доступа.
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                Ошибка:ОтсутствуютДанные:
+                  value:
+                    error: Username and password are required
+                  summary: 'Ошибка: отсутствуют данные'
+                Ошибка:НеверныеУчетныеДанные:
+                  value:
+                    error: Invalid credentials
+                  summary: 'Ошибка: неверные учетные данные'
+                Ошибка:ПользовательНеНайден:
+                  value:
+                    error: User not found
+                  summary: 'Ошибка: пользователь не найден'
+          description: 'Ошибка запроса. Возможные причины: отсутствуют данные, неверные
+            учетные данные или пользователь не найден.'
+  /api/logout/:
+    post:
+      operationId: api_logout_create
+      description: Удаляет токен текущего пользователя, завершая его сессию.
+      summary: Выход из системы
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                message: str
+              examples:
+                УспешныйЗапрос:
+                  value:
+                    message: Logged out successfully
+                  summary: Успешный запрос
+          description: Успешный выход из системы.
+  /api/schema/:
+    get:
+      operationId: root_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      security:
+      - tokenAuth: []
+      - Token: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/supervisor/candidates/:
+    get:
+      operationId: api_supervisor_candidates_list
+      description: Возвращает список доступных кандидатов с фильтрацией по возрасту,
+        курсам и дате создания.
+      summary: Получение информации о кандидатах
+      parameters:
+      - in: query
+        name: age
+        schema:
+          type: integer
+        description: Фильтрация по точному возрасту кандидата.
+      - in: query
+        name: age_max
+        schema:
+          type: integer
+        description: Максимальный возраст для фильтрации кандидатов.
+      - in: query
+        name: age_min
+        schema:
+          type: integer
+        description: Минимальный возраст для фильтрации кандидатов.
+      - in: query
+        name: by_new
+        schema:
+          type: string
+        description: 'Сортировка по дате создания. Значения: true (по убыванию), false
+          (по возрастанию).'
+      - in: query
+        name: courses
+        schema:
+          type: string
+        description: 'Фильтрация по пройденным курсам. Укажите через запятую. Возможные
+          значения: `course_rieltor_join` (курс риэлторов), `basic_legal_course` (базовый
+          юридический курс), `course_mortgage` (курс ипотечного кредитования), `course_taxation`
+          (курс по налогообложению).'
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidateInfo'
+          description: ''
+  /api/supervisor/favorites/:
+    get:
+      operationId: api_supervisor_favorites_list
+      description: Возвращает список избранных объектов пользователя.
+      summary: Получить список избранного
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Favorite'
+          description: Список избранных объектов успешно получен.
+    post:
+      operationId: api_supervisor_favorites_create
+      description: Добавляет новый объект в избранное для текущего пользователя.
+      summary: Добавить в избранное
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+          description: Объект успешно добавлен в избранное.
+  /api/supervisor/favorites/{id}/:
+    get:
+      operationId: api_supervisor_favorites_retrieve
+      description: Возвращает подробную информацию об объекте в избранном.
+      summary: Получить избранный объект
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+          description: Объект успешно получен.
+        '404':
+          content:
+            application/json:
+              schema:
+                error: str
+          description: Объект не найден.
+    put:
+      operationId: api_supervisor_favorites_update
+      description: Обновляет данные избранного объекта.
+      summary: Обновить избранный объект
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Favorite'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+          description: Объект успешно обновлён.
+    patch:
+      operationId: api_supervisor_favorites_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFavorite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFavorite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFavorite'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+          description: ''
+    delete:
+      operationId: api_supervisor_favorites_destroy
+      description: Удаляет объект из избранного пользователя.
+      summary: Удалить из избранного
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '204':
+          description: Объект успешно удалён.
+  /api/supervisor/invitations/:
+    get:
+      operationId: api_supervisor_invitations_retrieve
+      description: Возвращает список приглашённых рук-лем кандидатов, с поддержкой
+        фильтрации и отправкой новых приглашений
+      summary: Получение списка приглашённых кандидатов
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+        description: 'Фильтр по дате: конец диапазона (формат ''YYYY-MM-DD'').'
+      - in: query
+        name: start_date
+        schema:
+          type: string
+        description: 'Фильтр по дате: начало диапазона (формат ''YYYY-MM-DD'').'
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Фильтр по статусу приглашений (invited, accepted, rejected, self_rejected).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitation'
+          description: Список приглашений успешно получен.
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+          description: Ошибка в запросе или отсутствует супервизор.
+    post:
+      operationId: api_supervisor_invitations_create
+      description: Создает новое приглашение для кандидата, проверяя наличие квоты
+        у офиса.
+      summary: Создать новое приглашение
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+          description: Приглашение успешно создано.
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+          description: Ошибка в запросе (например, кандидат уже приглашён или неверные
+            данные).
+  /api/supervisor/statistic/quotas/:
+    get:
+      operationId: api_supervisor_statistic_quotas_list
+      description: Возвращает статистику по месяцам за указанный год или последние
+        10 месяцев по умолчанию. Для фильтрации можно передать параметр `year` (например,
+        ?year=2024).
+      summary: Статистика по месяцам
+      parameters:
+      - in: query
+        name: year
+        schema:
+          type: integer
+        description: Год для фильтрации статистики (например, 2024).
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MonthlyStatistic'
+          description: ''
+  /api/todo-stats/:
+    get:
+      operationId: api_todo_stats_retrieve
+      description: 'Возвращает статистику задач пользователя: общее количество созданных,
+        завершённых, удалённых задач, а также дни недели с максимальной активностью.'
+      summary: Получить статистику TODO
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: Фильтр задач по конечной дате создания (формат 'YYYY-MM-DD').
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Фильтр задач по начальной дате создания (формат 'YYYY-MM-DD').
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Пример:
+                  value:
+                    total_created: 25
+                    total_completed: 15
+                    total_deleted: 5
+                    max_created_day: Понедельник
+                    max_completed_day: Среда
+          description: Успешный ответ со статистикой задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+          description: Ошибка в запросе (например, неверный формат даты).
+  /api/todos/:
+    get:
+      operationId: api_todos_list
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+    post:
+      operationId: api_todos_create
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Todo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Todo'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+  /api/todos/{id}/:
+    get:
+      operationId: api_todos_retrieve
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+    put:
+      operationId: api_todos_update
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Todo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Todo'
+        required: true
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+    patch:
+      operationId: api_todos_partial_update
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTodo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTodo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTodo'
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+    delete:
+      operationId: api_todos_destroy
+      description: Возвращает список задач текущего пользователя. Поддерживается фильтрация
+        по `status` и `due_date`.
+      summary: Получение списка задач
+      parameters:
+      - in: query
+        name: due_date
+        schema:
+          type: string
+        description: Фильтр задач по дате выполнения (в формате 'YYYY-MM-DD')
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - Token: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+              examples:
+                ПримерУспешногоОтвета:
+                  value:
+                  - - id: 1
+                      title: Закончить проект
+                      description: Сделать финальные правки в проекте.
+                      status: pending
+                      due_date: '2025-01-25'
+                    - id: 2
+                      title: Прочитать книгу
+                      description: Дочитать книгу по программированию.
+                      status: completed
+                      due_date: '2025-01-20'
+                  summary: Пример успешного ответа
+          description: Успешный список задач
+        '400':
+          content:
+            application/json:
+              schema:
+                error: str
+              examples:
+                ПримерОшибки:
+                  value:
+                    error: Invalid date format in due_date parameter.
+                  summary: Пример ошибки
+          description: Ошибка в фильтрах запроса
+components:
+  schemas:
+    AdminInvitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0d0Enum'
+          title: Статус
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Отправлено
+        office_name:
+          type: string
+          readOnly: true
+        supervisor:
+          type: string
+          readOnly: true
+        office:
+          type: integer
+          title: Офис
+      required:
+      - created_at
+      - id
+      - office
+      - office_name
+      - supervisor
+    ArchiveCandidate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлён
+        bio:
+          type: string
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        city:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          title: Телефон
+          maxLength: 16
+        email:
+          type: string
+          format: email
+          nullable: true
+          title: Почта
+          maxLength: 254
+        cause:
+          type: string
+          readOnly: true
+      required:
+      - bio
+      - cause
+      - city
+      - email
+      - full_name
+      - id
+      - phone
+      - updated_at
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        age:
+          type: integer
+          readOnly: true
+        office_name:
+          type: string
+          readOnly: true
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+          readOnly: true
+        courses_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+        birth:
+          type: string
+          format: date
+        is_archive:
+          type: boolean
+          title: В архиве
+        name:
+          type: string
+          title: Имя
+          maxLength: 16
+        surname:
+          type: string
+          title: Фамилия
+          maxLength: 64
+        patronymic:
+          type: string
+          nullable: true
+          title: Отчество
+          maxLength: 32
+        education:
+          type: string
+          nullable: true
+          title: Образование
+          maxLength: 128
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        country:
+          type: string
+          title: Страна
+          maxLength: 32
+        city:
+          type: string
+          nullable: true
+          title: Город
+          maxLength: 32
+        email:
+          type: string
+          format: email
+          nullable: true
+          title: Почта
+          maxLength: 254
+        phone:
+          type: string
+          title: Телефон
+          maxLength: 16
+        resume:
+          type: string
+          nullable: true
+          title: Резюме
+          maxLength: 128
+        agreement:
+          type: string
+          format: uri
+          nullable: true
+          title: Согласие на ОПД
+        is_free:
+          type: boolean
+          title: Свободен
+        achivment_objects:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Объекты
+        achivment_clients:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Клиенты
+        achivment_leads:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Лиды
+        achivment_exclusives:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Эксклюзивы
+        achivment_deals:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Cделки
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создан
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлён
+        office:
+          type: integer
+          nullable: true
+      required:
+      - age
+      - birth
+      - courses
+      - created_at
+      - email
+      - id
+      - name
+      - office_name
+      - phone
+      - surname
+      - updated_at
+    CandidateInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Имя
+          maxLength: 16
+        surname:
+          type: string
+          title: Фамилия
+          maxLength: 64
+        patronymic:
+          type: string
+          nullable: true
+          title: Отчество
+          maxLength: 32
+        birth:
+          type: string
+          format: date
+        age:
+          type: integer
+          readOnly: true
+        education:
+          type: string
+          nullable: true
+          title: Образование
+          maxLength: 128
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        country:
+          type: string
+          title: Страна
+          maxLength: 32
+        city:
+          type: string
+          nullable: true
+          title: Город
+          maxLength: 32
+        resume:
+          type: string
+          nullable: true
+          title: Резюме
+          maxLength: 128
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлён
+        is_favorite:
+          type: boolean
+          readOnly: true
+        favorite_id:
+          type: integer
+          readOnly: true
+        is_invited:
+          type: boolean
+          readOnly: true
+        achivment_objects:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Объекты
+        achivment_clients:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Клиенты
+        achivment_leads:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Лиды
+        achivment_exclusives:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Эксклюзивы
+        achivment_deals:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Cделки
+      required:
+      - age
+      - birth
+      - courses
+      - favorite_id
+      - id
+      - is_favorite
+      - is_invited
+      - name
+      - surname
+      - updated_at
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 32
+      required:
+      - id
+      - name
+    Favorite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        candidate:
+          type: integer
+          title: Кандидат
+        candidate_info:
+          allOf:
+          - $ref: '#/components/schemas/CandidateInfo'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Добавлено в избранное
+      required:
+      - candidate
+      - candidate_info
+      - created_at
+      - id
+    Invitation:
+      type: object
+      properties:
+        candidate:
+          type: integer
+          title: Кандидат
+        name:
+          type: string
+          readOnly: true
+        surname:
+          type: string
+          readOnly: true
+        patronymic:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        age:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        updated_at:
+          type: string
+          readOnly: true
+      required:
+      - age
+      - candidate
+      - city
+      - name
+      - patronymic
+      - photo
+      - status
+      - surname
+      - updated_at
+    InvitationStatistics:
+      type: object
+      properties:
+        full_name:
+          type: string
+          readOnly: true
+        photo:
+          type: string
+          readOnly: true
+        age:
+          type: integer
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0d0Enum'
+          title: Статус
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлено
+      required:
+      - age
+      - city
+      - full_name
+      - photo
+      - updated_at
+    MonthlyStatistic:
+      type: object
+      properties:
+        month:
+          type: string
+        issued:
+          type: integer
+        invited:
+          type: integer
+        accepted:
+          type: integer
+        rejected:
+          type: integer
+        subtracted:
+          type: integer
+      required:
+      - accepted
+      - invited
+      - issued
+      - month
+      - rejected
+      - subtracted
+    Office:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название офиса
+          maxLength: 255
+        location:
+          type: string
+          title: Местоположение
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Телефон
+          maxLength: 15
+        quota:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Базовая квота
+        used_quota:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Использованная квота
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - location
+      - name
+      - quota
+    PatchedCandidate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        age:
+          type: integer
+          readOnly: true
+        office_name:
+          type: string
+          readOnly: true
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+          readOnly: true
+        courses_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+        birth:
+          type: string
+          format: date
+        is_archive:
+          type: boolean
+          title: В архиве
+        name:
+          type: string
+          title: Имя
+          maxLength: 16
+        surname:
+          type: string
+          title: Фамилия
+          maxLength: 64
+        patronymic:
+          type: string
+          nullable: true
+          title: Отчество
+          maxLength: 32
+        education:
+          type: string
+          nullable: true
+          title: Образование
+          maxLength: 128
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        country:
+          type: string
+          title: Страна
+          maxLength: 32
+        city:
+          type: string
+          nullable: true
+          title: Город
+          maxLength: 32
+        email:
+          type: string
+          format: email
+          nullable: true
+          title: Почта
+          maxLength: 254
+        phone:
+          type: string
+          title: Телефон
+          maxLength: 16
+        resume:
+          type: string
+          nullable: true
+          title: Резюме
+          maxLength: 128
+        agreement:
+          type: string
+          format: uri
+          nullable: true
+          title: Согласие на ОПД
+        is_free:
+          type: boolean
+          title: Свободен
+        achivment_objects:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Объекты
+        achivment_clients:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Клиенты
+        achivment_leads:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Лиды
+        achivment_exclusives:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Эксклюзивы
+        achivment_deals:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Cделки
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создан
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлён
+        office:
+          type: integer
+          nullable: true
+    PatchedFavorite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        candidate:
+          type: integer
+          title: Кандидат
+        candidate_info:
+          allOf:
+          - $ref: '#/components/schemas/CandidateInfo'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Добавлено в избранное
+    PatchedOffice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название офиса
+          maxLength: 255
+        location:
+          type: string
+          title: Местоположение
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Телефон
+          maxLength: 15
+        quota:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Базовая квота
+        used_quota:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          title: Использованная квота
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedQuotaRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        office:
+          type: integer
+          readOnly: true
+          title: Оффис
+        office_name:
+          type: string
+          readOnly: true
+        amount:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusA13Enum'
+          title: Статус
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создано
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлено
+    PatchedSupervisor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          $ref: '#/components/schemas/User'
+        office:
+          type: integer
+          nullable: true
+          title: Офис
+        office_name:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          nullable: true
+          title: Подразделение
+          maxLength: 128
+    PatchedTodo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+          readOnly: true
+        task:
+          type: string
+          title: Задача
+        due_date:
+          type: string
+          format: date-time
+          title: Дата выполнения
+        is_complete:
+          type: boolean
+          title: Выполнено
+        is_deleted:
+          type: boolean
+          title: Удалена
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата создания
+    QuotaRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        office:
+          type: integer
+          readOnly: true
+          title: Оффис
+        office_name:
+          type: string
+          readOnly: true
+        amount:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusA13Enum'
+          title: Статус
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создано
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Обновлено
+      required:
+      - amount
+      - created_at
+      - id
+      - office
+      - office_name
+      - updated_at
+    QuotaRequestDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        amount:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создано
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusA13Enum'
+          title: Статус
+        office_info:
+          allOf:
+          - $ref: '#/components/schemas/Office'
+          readOnly: true
+        history:
+          type: string
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - history
+      - id
+      - office_info
+    Status0d0Enum:
+      enum:
+      - invited
+      - accepted
+      - rejected
+      - self_rejected
+      type: string
+      description: |-
+        * `invited` - Приглашён
+        * `accepted` - Принят
+        * `rejected` - Отклонён
+        * `self_rejected` - Отказ Кандидата
+    StatusA13Enum:
+      enum:
+      - waited
+      - accepted
+      - rejected
+      type: string
+      description: |-
+        * `waited` - ожидание
+        * `accepted` - Принято
+        * `rejected` - Отклонено
+    Supervisor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          $ref: '#/components/schemas/User'
+        office:
+          type: integer
+          nullable: true
+          title: Офис
+        office_name:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          nullable: true
+          title: Подразделение
+          maxLength: 128
+      required:
+      - department
+      - id
+      - office
+      - office_name
+      - user
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+          readOnly: true
+        task:
+          type: string
+          title: Задача
+        due_date:
+          type: string
+          format: date-time
+          title: Дата выполнения
+        is_complete:
+          type: boolean
+          title: Выполнено
+        is_deleted:
+          type: boolean
+          title: Удалена
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата создания
+      required:
+      - created_at
+      - due_date
+      - id
+      - task
+      - user
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          title: Адрес электронной почты
+          maxLength: 254
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+        patronymic:
+          type: string
+          nullable: true
+          title: Отчество
+          maxLength: 32
+        phone:
+          type: string
+          nullable: true
+          title: Номер телефона
+          maxLength: 15
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        full_name:
+          type: string
+          readOnly: true
+      required:
+      - full_name
+      - username
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

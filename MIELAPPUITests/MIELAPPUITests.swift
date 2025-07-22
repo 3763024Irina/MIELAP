@@ -6,36 +6,62 @@
 //
 
 import XCTest
+import XCTest
 
 final class MIELAPPUITests: XCTestCase {
+    let app = XCUIApplication()
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
+    // 1. Проверка загрузки главного экрана и списка кандидатов
+    func testCandidateListLoads() throws {
+        // Проверяем, что заголовок "Витрина кандидатов" есть
+        let title = app.staticTexts["Витрина кандидатов"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+
+        // Проверяем, что хотя бы одна ячейка кандидата появилась
+        let candidateCell = app.tables.cells.element(boundBy: 0)
+        XCTAssertTrue(candidateCell.waitForExistence(timeout: 10))
+    }
+
+    // 2. Проверка отправки приглашения кандидату
+    func testSendInviteToCandidate() throws {
+        // Ждем появления ячеек кандидатов
+        let firstCandidate = app.tables.cells.element(boundBy: 0)
+        XCTAssertTrue(firstCandidate.waitForExistence(timeout: 10))
+
+        // Находим кнопку "Пригласить" в первой ячейке
+        let inviteButton = firstCandidate.buttons["Пригласить"]
+        XCTAssertTrue(inviteButton.exists)
+
+        // Нажимаем "Пригласить"
+        inviteButton.tap()
+
+        // Проверяем, что появилось уведомление об успешной отправке
+        let successAlert = app.alerts["Успех"]
+        XCTAssertTrue(successAlert.waitForExistence(timeout: 5))
+    }
+
+    // 3. Проверка авторизации (если она реализована)
+    func testAuthAndCandidateList() throws {
+        // Если есть экран логина
+        let loginField = app.textFields["Логин"]
+        let passwordField = app.secureTextFields["Пароль"]
+        let loginButton = app.buttons["Войти"]
+
+        if loginField.exists {
+            loginField.tap()
+            loginField.typeText("supervisor")
+            passwordField.tap()
+            passwordField.typeText("supervisor")
+            loginButton.tap()
         }
+
+        // Проверяем, что после входа загрузился список кандидатов
+        let candidateCell = app.tables.cells.element(boundBy: 0)
+        XCTAssertTrue(candidateCell.waitForExistence(timeout: 10))
     }
 }

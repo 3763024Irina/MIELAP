@@ -7,16 +7,36 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C0805372E2FB52F002E93BA /* APIServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7AFDD02E2EC288007BC76C /* APIServiceTests.swift */; };
+		8C0805392E2FCECF002E93BA /* GreetingControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */; };
 		8C3A23392E22AA3600A21B8A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23382E22AA3600A21B8A /* AppDelegate.swift */; };
 		8C3A233B2E22AA3600A21B8A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A233A2E22AA3600A21B8A /* SceneDelegate.swift */; };
-		8C3A233D2E22AA3600A21B8A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A233C2E22AA3600A21B8A /* ViewController.swift */; };
-		8C3A23402E22AA3600A21B8A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3A233E2E22AA3600A21B8A /* Main.storyboard */; };
 		8C3A23432E22AA3600A21B8A /* MIELAPP.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23412E22AA3600A21B8A /* MIELAPP.xcdatamodeld */; };
-		8C3A23452E22AA3800A21B8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C3A23442E22AA3800A21B8A /* Assets.xcassets */; };
 		8C3A23482E22AA3800A21B8A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C3A23462E22AA3800A21B8A /* LaunchScreen.storyboard */; };
 		8C3A23532E22AA3800A21B8A /* MIELAPPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23522E22AA3800A21B8A /* MIELAPPTests.swift */; };
-		8C3A235D2E22AA3800A21B8A /* MIELAPPUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A235C2E22AA3800A21B8A /* MIELAPPUITests.swift */; };
 		8C3A235F2E22AA3800A21B8A /* MIELAPPUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A235E2E22AA3800A21B8A /* MIELAPPUITestsLaunchTests.swift */; };
+		8C3A23702E22FCE700A21B8A /* CandidatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A236F2E22FCE700A21B8A /* CandidatesViewController.swift */; };
+		8C3A23722E22FCFE00A21B8A /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23712E22FCFE00A21B8A /* FavoritesViewController.swift */; };
+		8C3A23742E22FD0C00A21B8A /* InvitationsViewController .swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23732E22FD0C00A21B8A /* InvitationsViewController .swift */; };
+		8C3A23762E22FD1A00A21B8A /* QuotasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23752E22FD1A00A21B8A /* QuotasViewController.swift */; };
+		8C3A23782E22FE4800A21B8A /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3A23772E22FE4800A21B8A /* LoginViewController.swift */; };
+		8C3C3E2E2E28286E00A9735F /* MonthlyQuotaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C3E2D2E28286E00A9735F /* MonthlyQuotaCell.swift */; };
+		8C4CACB62E2515B000A0E713 /* SupervisorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACB52E2515B000A0E713 /* SupervisorHelper.swift */; };
+		8C4CACB82E25758300A0E713 /* InviteCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACB72E25758300A0E713 /* InviteCandidate.swift */; };
+		8C4CACBA2E2575D700A0E713 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACB92E2575D700A0E713 /* InvitationCell.swift */; };
+		8C4CACBE2E26856A00A0E713 /* ApiAPI+GetLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACBD2E26856A00A0E713 /* ApiAPI+GetLink.swift */; };
+		8C7AFDD52E2ECD94007BC76C /* OpenAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */; };
+		8C7AFDD72E2ECD99007BC76C /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD62E2ECD99007BC76C /* AnyCodable */; };
+		8C7AFDD92E2ECE55007BC76C /* OpenAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD82E2ECE55007BC76C /* OpenAPIClient */; };
+		8C7AFDDB2E2ECE5B007BC76C /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDDA2E2ECE5B007BC76C /* AnyCodable */; };
+		8C917E622E2AADBD004FF145 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C917E612E2AADBD004FF145 /* WelcomeViewController.swift */; };
+		8C917E642E2ABF4F004FF145 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C917E632E2ABF4F004FF145 /* Assets.xcassets */; };
+		8C9891942E23108700585415 /* OpenAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 8C9891932E23108700585415 /* OpenAPIClient */; };
+		8C9891962E23119000585415 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9891952E23119000585415 /* MainTabBarController.swift */; };
+		8C9891992E23157200585415 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C9891982E23157200585415 /* AnyCodable */; settings = {ATTRIBUTES = (Required, ); }; };
+		8C98919D2E23A02900585415 /* SupervisorHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C98919C2E23A02900585415 /* SupervisorHeaderView.swift */; };
+		8C9891A12E23A86C00585415 /* CandidateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9891A02E23A86C00585415 /* CandidateCell.swift */; };
+		ACF64CE501B6B30A616C8AE1 /* Pods_MIELAPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D85F03DEC2B0CCBBCF2A2EE7 /* Pods_MIELAPP.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,13 +57,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4EC1FA5D9C0F73F99FD0AC18 /* Pods-MIELAPP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIELAPP.release.xcconfig"; path = "Target Support Files/Pods-MIELAPP/Pods-MIELAPP.release.xcconfig"; sourceTree = "<group>"; };
+		74A130189F55DFC653764CDD /* Pods-MIELAPP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIELAPP.debug.xcconfig"; path = "Target Support Files/Pods-MIELAPP/Pods-MIELAPP.debug.xcconfig"; sourceTree = "<group>"; };
+		8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingControllerView.swift; sourceTree = "<group>"; };
 		8C3A23352E22AA3600A21B8A /* MIELAPP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MIELAPP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3A23382E22AA3600A21B8A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C3A233A2E22AA3600A21B8A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		8C3A233C2E22AA3600A21B8A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		8C3A233F2E22AA3600A21B8A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8C3A23422E22AA3600A21B8A /* MIELAPP.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MIELAPP.xcdatamodel; sourceTree = "<group>"; };
-		8C3A23442E22AA3800A21B8A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8C3A23472E22AA3800A21B8A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8C3A23492E22AA3800A21B8A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8C3A234E2E22AA3800A21B8A /* MIELAPPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MIELAPPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +71,24 @@
 		8C3A23582E22AA3800A21B8A /* MIELAPPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MIELAPPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C3A235C2E22AA3800A21B8A /* MIELAPPUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIELAPPUITests.swift; sourceTree = "<group>"; };
 		8C3A235E2E22AA3800A21B8A /* MIELAPPUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIELAPPUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		8C3A236F2E22FCE700A21B8A /* CandidatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidatesViewController.swift; sourceTree = "<group>"; };
+		8C3A23712E22FCFE00A21B8A /* FavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
+		8C3A23732E22FD0C00A21B8A /* InvitationsViewController .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InvitationsViewController .swift"; sourceTree = "<group>"; };
+		8C3A23752E22FD1A00A21B8A /* QuotasViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotasViewController.swift; sourceTree = "<group>"; };
+		8C3A23772E22FE4800A21B8A /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		8C3C3E2D2E28286E00A9735F /* MonthlyQuotaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyQuotaCell.swift; sourceTree = "<group>"; };
+		8C4CACB52E2515B000A0E713 /* SupervisorHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupervisorHelper.swift; sourceTree = "<group>"; };
+		8C4CACB72E25758300A0E713 /* InviteCandidate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteCandidate.swift; sourceTree = "<group>"; };
+		8C4CACB92E2575D700A0E713 /* InvitationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationCell.swift; sourceTree = "<group>"; };
+		8C4CACBD2E26856A00A0E713 /* ApiAPI+GetLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApiAPI+GetLink.swift"; sourceTree = "<group>"; };
+		8C7AFDD02E2EC288007BC76C /* APIServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIServiceTests.swift; sourceTree = "<group>"; };
+		8C917E612E2AADBD004FF145 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		8C917E632E2ABF4F004FF145 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8C9891952E23119000585415 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		8C98919C2E23A02900585415 /* SupervisorHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupervisorHeaderView.swift; sourceTree = "<group>"; };
+		8C9891A02E23A86C00585415 /* CandidateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateCell.swift; sourceTree = "<group>"; };
+		8CAE3BA92E230F7A002C0DD9 /* GeneratedAPI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = GeneratedAPI; sourceTree = "<group>"; };
+		D85F03DEC2B0CCBBCF2A2EE7 /* Pods_MIELAPP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MIELAPP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +96,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C9891942E23108700585415 /* OpenAPIClient in Frameworks */,
+				8C9891992E23157200585415 /* AnyCodable in Frameworks */,
+				ACF64CE501B6B30A616C8AE1 /* Pods_MIELAPP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +106,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C7AFDD72E2ECD99007BC76C /* AnyCodable in Frameworks */,
+				8C7AFDD52E2ECD94007BC76C /* OpenAPIClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,19 +115,42 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C7AFDDB2E2ECE5B007BC76C /* AnyCodable in Frameworks */,
+				8C7AFDD92E2ECE55007BC76C /* OpenAPIClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E440BF5BB20FAD27291C223 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D85F03DEC2B0CCBBCF2A2EE7 /* Pods_MIELAPP.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		126B2C5DDF8908BDD72B13FB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				74A130189F55DFC653764CDD /* Pods-MIELAPP.debug.xcconfig */,
+				4EC1FA5D9C0F73F99FD0AC18 /* Pods-MIELAPP.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		8C3A232C2E22AA3600A21B8A = {
 			isa = PBXGroup;
 			children = (
+				8C917E632E2ABF4F004FF145 /* Assets.xcassets */,
+				8C3A236D2E22ECDF00A21B8A /* Packages */,
 				8C3A23372E22AA3600A21B8A /* MIELAPP */,
 				8C3A23512E22AA3800A21B8A /* MIELAPPTests */,
 				8C3A235B2E22AA3800A21B8A /* MIELAPPUITests */,
 				8C3A23362E22AA3600A21B8A /* Products */,
+				126B2C5DDF8908BDD72B13FB /* Pods */,
+				0E440BF5BB20FAD27291C223 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -101,11 +167,10 @@
 		8C3A23372E22AA3600A21B8A /* MIELAPP */ = {
 			isa = PBXGroup;
 			children = (
+				8C98919B2E239FFE00585415 /* View */,
+				8C98919A2E2396E300585415 /* Controller */,
 				8C3A23382E22AA3600A21B8A /* AppDelegate.swift */,
 				8C3A233A2E22AA3600A21B8A /* SceneDelegate.swift */,
-				8C3A233C2E22AA3600A21B8A /* ViewController.swift */,
-				8C3A233E2E22AA3600A21B8A /* Main.storyboard */,
-				8C3A23442E22AA3800A21B8A /* Assets.xcassets */,
 				8C3A23462E22AA3800A21B8A /* LaunchScreen.storyboard */,
 				8C3A23492E22AA3800A21B8A /* Info.plist */,
 				8C3A23412E22AA3600A21B8A /* MIELAPP.xcdatamodeld */,
@@ -125,9 +190,47 @@
 			isa = PBXGroup;
 			children = (
 				8C3A235C2E22AA3800A21B8A /* MIELAPPUITests.swift */,
+				8C7AFDD02E2EC288007BC76C /* APIServiceTests.swift */,
 				8C3A235E2E22AA3800A21B8A /* MIELAPPUITestsLaunchTests.swift */,
 			);
 			path = MIELAPPUITests;
+			sourceTree = "<group>";
+		};
+		8C3A236D2E22ECDF00A21B8A /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				8CAE3BA92E230F7A002C0DD9 /* GeneratedAPI */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		8C98919A2E2396E300585415 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				8C917E612E2AADBD004FF145 /* WelcomeViewController.swift */,
+				8C3A23772E22FE4800A21B8A /* LoginViewController.swift */,
+				8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */,
+				8C3A236F2E22FCE700A21B8A /* CandidatesViewController.swift */,
+				8C3A23712E22FCFE00A21B8A /* FavoritesViewController.swift */,
+				8C9891A02E23A86C00585415 /* CandidateCell.swift */,
+				8C9891952E23119000585415 /* MainTabBarController.swift */,
+				8C3A23732E22FD0C00A21B8A /* InvitationsViewController .swift */,
+				8C4CACB92E2575D700A0E713 /* InvitationCell.swift */,
+				8C4CACB72E25758300A0E713 /* InviteCandidate.swift */,
+				8C4CACBD2E26856A00A0E713 /* ApiAPI+GetLink.swift */,
+				8C3A23752E22FD1A00A21B8A /* QuotasViewController.swift */,
+				8C3C3E2D2E28286E00A9735F /* MonthlyQuotaCell.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		8C98919B2E239FFE00585415 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8C98919C2E23A02900585415 /* SupervisorHeaderView.swift */,
+				8C4CACB52E2515B000A0E713 /* SupervisorHelper.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -137,15 +240,21 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8C3A23622E22AA3800A21B8A /* Build configuration list for PBXNativeTarget "MIELAPP" */;
 			buildPhases = (
+				E82983435BA522C95CC51F35 /* [CP] Check Pods Manifest.lock */,
 				8C3A23312E22AA3600A21B8A /* Sources */,
 				8C3A23322E22AA3600A21B8A /* Frameworks */,
 				8C3A23332E22AA3600A21B8A /* Resources */,
+				1CACAF8D6AB5436CAA38B20C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = MIELAPP;
+			packageProductDependencies = (
+				8C9891932E23108700585415 /* OpenAPIClient */,
+				8C9891982E23157200585415 /* AnyCodable */,
+			);
 			productName = MIELAPP;
 			productReference = 8C3A23352E22AA3600A21B8A /* MIELAPP.app */;
 			productType = "com.apple.product-type.application";
@@ -164,6 +273,10 @@
 				8C3A23502E22AA3800A21B8A /* PBXTargetDependency */,
 			);
 			name = MIELAPPTests;
+			packageProductDependencies = (
+				8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */,
+				8C7AFDD62E2ECD99007BC76C /* AnyCodable */,
+			);
 			productName = MIELAPPTests;
 			productReference = 8C3A234E2E22AA3800A21B8A /* MIELAPPTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -182,6 +295,10 @@
 				8C3A235A2E22AA3800A21B8A /* PBXTargetDependency */,
 			);
 			name = MIELAPPUITests;
+			packageProductDependencies = (
+				8C7AFDD82E2ECE55007BC76C /* OpenAPIClient */,
+				8C7AFDDA2E2ECE5B007BC76C /* AnyCodable */,
+			);
 			productName = MIELAPPUITests;
 			productReference = 8C3A23582E22AA3800A21B8A /* MIELAPPUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -218,6 +335,9 @@
 				Base,
 			);
 			mainGroup = 8C3A232C2E22AA3600A21B8A;
+			packageReferences = (
+				8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */,
+			);
 			productRefGroup = 8C3A23362E22AA3600A21B8A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -234,9 +354,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C917E642E2ABF4F004FF145 /* Assets.xcassets in Resources */,
 				8C3A23482E22AA3800A21B8A /* LaunchScreen.storyboard in Resources */,
-				8C3A23452E22AA3800A21B8A /* Assets.xcassets in Resources */,
-				8C3A23402E22AA3600A21B8A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,15 +375,71 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		1CACAF8D6AB5436CAA38B20C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MIELAPP/Pods-MIELAPP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MIELAPP/Pods-MIELAPP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MIELAPP/Pods-MIELAPP-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E82983435BA522C95CC51F35 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MIELAPP-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8C3A23312E22AA3600A21B8A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C3A23782E22FE4800A21B8A /* LoginViewController.swift in Sources */,
+				8C3A23702E22FCE700A21B8A /* CandidatesViewController.swift in Sources */,
+				8C9891962E23119000585415 /* MainTabBarController.swift in Sources */,
+				8C0805392E2FCECF002E93BA /* GreetingControllerView.swift in Sources */,
+				8C4CACB62E2515B000A0E713 /* SupervisorHelper.swift in Sources */,
+				8C3A23762E22FD1A00A21B8A /* QuotasViewController.swift in Sources */,
 				8C3A23432E22AA3600A21B8A /* MIELAPP.xcdatamodeld in Sources */,
-				8C3A233D2E22AA3600A21B8A /* ViewController.swift in Sources */,
+				8C4CACBA2E2575D700A0E713 /* InvitationCell.swift in Sources */,
+				8C98919D2E23A02900585415 /* SupervisorHeaderView.swift in Sources */,
+				8C917E622E2AADBD004FF145 /* WelcomeViewController.swift in Sources */,
+				8C4CACB82E25758300A0E713 /* InviteCandidate.swift in Sources */,
 				8C3A23392E22AA3600A21B8A /* AppDelegate.swift in Sources */,
+				8C3A23742E22FD0C00A21B8A /* InvitationsViewController .swift in Sources */,
+				8C3C3E2E2E28286E00A9735F /* MonthlyQuotaCell.swift in Sources */,
+				8C4CACBE2E26856A00A0E713 /* ApiAPI+GetLink.swift in Sources */,
+				8C3A23722E22FCFE00A21B8A /* FavoritesViewController.swift in Sources */,
 				8C3A233B2E22AA3600A21B8A /* SceneDelegate.swift in Sources */,
+				8C9891A12E23A86C00585415 /* CandidateCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,6 +447,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C0805372E2FB52F002E93BA /* APIServiceTests.swift in Sources */,
 				8C3A23532E22AA3800A21B8A /* MIELAPPTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -280,7 +456,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C3A235D2E22AA3800A21B8A /* MIELAPPUITests.swift in Sources */,
 				8C3A235F2E22AA3800A21B8A /* MIELAPPUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -301,14 +476,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8C3A233E2E22AA3600A21B8A /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8C3A233F2E22AA3600A21B8A /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		8C3A23462E22AA3800A21B8A /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -436,6 +603,7 @@
 		};
 		8C3A23632E22AA3800A21B8A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 74A130189F55DFC653764CDD /* Pods-MIELAPP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -445,8 +613,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MIELAPP/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -464,6 +632,7 @@
 		};
 		8C3A23642E22AA3800A21B8A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4EC1FA5D9C0F73F99FD0AC18 /* Pods-MIELAPP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -473,8 +642,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MIELAPP/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -606,6 +775,47 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Flight-School/AnyCodable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OpenAPIClient;
+		};
+		8C7AFDD62E2ECD99007BC76C /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
+		};
+		8C7AFDD82E2ECE55007BC76C /* OpenAPIClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OpenAPIClient;
+		};
+		8C7AFDDA2E2ECE5B007BC76C /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
+		};
+		8C9891932E23108700585415 /* OpenAPIClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OpenAPIClient;
+		};
+		8C9891982E23157200585415 /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		8C3A23412E22AA3600A21B8A /* MIELAPP.xcdatamodeld */ = {
