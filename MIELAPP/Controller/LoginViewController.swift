@@ -5,26 +5,21 @@ import AnyCodable
 final class LoginViewController: UIViewController {
     var completion: (() -> Void)?
     
-    // --- ЛОГОТИП ---
+    // --- UI ---
     private let logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "logo1"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
-        imageView.alpha = 1
         return imageView
     }()
-    // --- ТЕКСТ ---
     private let welcomeLabel: UILabel = {
         let label = UILabel()
         label.text = "Добро пожаловать!"
-        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 22, weight: .regular)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.alpha = 1
         return label
     }()
-    // --- КОНТЕЙНЕР ДЛЯ ФОРМЫ ---
     private let containerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +31,6 @@ final class LoginViewController: UIViewController {
         view.layer.shadowRadius = 4
         return view
     }()
-    // --- ПОЛЯ ФОРМЫ ---
     private let usernameField: UITextField = {
         let field = UITextField()
         field.placeholder = "Логин"
@@ -57,11 +51,7 @@ final class LoginViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Войти", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = UIColor.white
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         button.layer.cornerRadius = 12
-        button.contentEdgeInsets = UIEdgeInsets(top: 12, left: 20, bottom: 12, right: 20)
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1).cgColor
         return button
@@ -84,23 +74,16 @@ final class LoginViewController: UIViewController {
     }()
     private let agreementLabel: UILabel = {
         let label = UILabel()
-        label.text = "Выполняя вход, вы соглашаетесь с Условиями и\nПолитикой конфиденциальности"
+        label.text = "Выполняя вход, вы соглашаетесь с Условиями и Политикой конфиденциальности"
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .black
-        label.numberOfLines = 2
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.alpha = 1
         return label
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        print("Лого найден?", UIImage(named: "logo1") != nil)
-        print("LoginViewController открыт")
-        
-        // Для теста: автозаполнение (убери при релизе)
 #if DEBUG
         usernameField.text = "supervisor"
         passwordField.text = "supervisor"
@@ -119,23 +102,20 @@ final class LoginViewController: UIViewController {
         containerView.addSubview(loginButton)
         containerView.addSubview(errorLabel)
         containerView.addSubview(activityIndicator)
-        
+
         NSLayoutConstraint.activate([
-            // Лого по центру!
-            logoImageView.widthAnchor.constraint(equalToConstant: 138),
-            logoImageView.heightAnchor.constraint(equalToConstant: 138),
             logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 138),
+            logoImageView.heightAnchor.constraint(equalToConstant: 138),
             
             welcomeLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 32),
             welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            welcomeLabel.widthAnchor.constraint(equalToConstant: 328),
-            welcomeLabel.heightAnchor.constraint(equalToConstant: 26),
             
-            containerView.widthAnchor.constraint(equalToConstant: 328),
-            containerView.heightAnchor.constraint(equalToConstant: 236),
             containerView.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 32),
             containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerView.widthAnchor.constraint(equalToConstant: 328),
+            containerView.heightAnchor.constraint(equalToConstant: 236),
             
             usernameField.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20),
             usernameField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
@@ -165,37 +145,49 @@ final class LoginViewController: UIViewController {
         ])
     }
     
-    @objc
-    private func loginButtonTapped() {
+    @objc private func loginButtonTapped() {
         view.endEditing(true)
-        let username = usernameField.text ?? ""
-        let password = passwordField.text ?? ""
         errorLabel.isHidden = true
         activityIndicator.startAnimating()
         loginButton.isEnabled = false
-        
+
         let body: [String: String] = [
-            "username": username,
-            "password": password
+            "username": usernameField.text ?? "",
+            "password": passwordField.text ?? ""
         ]
+
         let anyBody = AnyCodable(body)
-        
         ApiAPI.apiLoginCreate(body: anyBody) { [weak self] data, error in
             DispatchQueue.main.async {
                 self?.activityIndicator.stopAnimating()
                 self?.loginButton.isEnabled = true
-                
+
                 if let error = error {
                     self?.errorLabel.text = "Ошибка входа: \(error.localizedDescription)"
                     self?.errorLabel.isHidden = false
                     return
                 }
-                if let window = UIApplication.shared
-                    .connectedScenes
+                
+                guard
+                    let dict = data?.value as? [String: Any],
+                    let token = dict["token"] as? String
+                else {
+                    self?.errorLabel.text = "Не удалось получить токен"
+                    self?.errorLabel.isHidden = false
+                    return
+                }
+
+                // Сохраняем токен
+                UserDefaults.standard.set(token, forKey: "authToken")
+                OpenAPIClientAPI.customHeaders["Authorization"] = "Token \(token)"
+                print("Токен сохранён: \(token)")
+
+                // Переход на Greeting
+                if let window = UIApplication.shared.connectedScenes
                     .compactMap({ $0 as? UIWindowScene })
                     .flatMap({ $0.windows })
-                    .first(where: { $0.isKeyWindow })
-                {
+                    .first(where: { $0.isKeyWindow }) {
+
                     let greetingVC = GreetingViewController()
                     greetingVC.completion = {
                         print("SceneDelegate: Показываю MainTabBarController")
@@ -203,12 +195,8 @@ final class LoginViewController: UIViewController {
                         window.setRootViewController(mainTabBar)
                     }
                     window.setRootViewController(greetingVC)
-                } else {
-                    self?.errorLabel.text = "Не удалось получить токен"
-                    self?.errorLabel.isHidden = false
                 }
             }
         }
     }
-    
 }

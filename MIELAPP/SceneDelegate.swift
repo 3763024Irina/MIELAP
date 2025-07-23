@@ -4,33 +4,52 @@ import OpenAPIClient
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        let window = UIWindow(windowScene: windowScene)
-        self.window = window
-        
-        // 1. Welcome
+        window = UIWindow(windowScene: windowScene)
+
+        showWelcome() // первый экран
+
+        window?.makeKeyAndVisible()
+    }
+
+    private func showWelcome() {
         let welcomeVC = WelcomeViewController()
-        window.rootViewController = welcomeVC
-        window.makeKeyAndVisible()
+        window?.rootViewController = welcomeVC
         print("SceneDelegate: WelcomeViewController открыт")
-        
-        // 2. Login через 1.2 сек
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            print("SceneDelegate: Показываю LoginViewController")
-            let loginVC = LoginViewController()
-            loginVC.completion = {
-                print("SceneDelegate: Показываю GreetingViewController")
-                let greetingVC = GreetingViewController()
-                greetingVC.completion = {
-                    print("SceneDelegate: Показываю MainTabBarController")
-                    let mainTabBar = MainTabBarController()
-                    window.setRootViewController(mainTabBar) // <--- вот тут!
-                }
-                window.setRootViewController(greetingVC)
-            }
-            window.setRootViewController(loginVC)
+
+        // Переход к логину через 1.2 сек
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+            self?.showLogin()
         }
+    }
+
+    private func showLogin() {
+        print("SceneDelegate: Показываю LoginViewController")
+        let loginVC = LoginViewController()
+        loginVC.completion = { [weak self] in
+            self?.showGreeting()
+        }
+        window?.setRootViewController(loginVC)
+    }
+
+    private func showGreeting() {
+        print("SceneDelegate: Показываю GreetingViewController")
+        let greetingVC = GreetingViewController()
+        greetingVC.completion = { [weak self] in
+            self?.showMainTabBar()
+        }
+        window?.setRootViewController(greetingVC)
+    }
+
+    private func showMainTabBar() {
+        print("SceneDelegate: Показываю MainTabBarController")
+        let mainTabBar = MainTabBarController()
+        window?.setRootViewController(mainTabBar)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {}
@@ -40,16 +59,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidEnterBackground(_ scene: UIScene) {}
 }
 
-// Extension — ставь вне класса SceneDelegate!
+// MARK: - Плавная замена rootViewController
 extension UIWindow {
     func setRootViewController(_ vc: UIViewController, animated: Bool = true) {
         guard animated else {
-            self.rootViewController = vc
-            self.makeKeyAndVisible()
+            rootViewController = vc
+            makeKeyAndVisible()
             return
         }
-        UIView.transition(with: self, duration: 0.35, options: .transitionCrossDissolve, animations: {
-            self.rootViewController = vc
-        }, completion: nil)
+        UIView.transition(with: self,
+                          duration: 0.35,
+                          options: .transitionCrossDissolve,
+                          animations: {
+                              self.rootViewController = vc
+                          },
+                          completion: nil)
     }
 }
