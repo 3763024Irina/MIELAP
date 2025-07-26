@@ -10,7 +10,7 @@ final class APIServiceTests: XCTestCase {
         OpenAPIClientAPI.customHeaders.removeAll()
         UserDefaults.standard.removeObject(forKey: "authToken")
     }
-    
+   //Успешность входа в систему через эндпоинт /api/login/. Убедиться, что сервер возвращает ответ на логин без ошибок.
     func testLogin() {
         let exp = expectation(description: "login")
         let body: [String: String] = ["username": "supervisor", "password": "supervisor"]
@@ -23,7 +23,7 @@ final class APIServiceTests: XCTestCase {
         }
         wait(for: [exp], timeout: 5)
     }
-    
+    //Что API не отдаёт приватные данные без авторизационного токена.Сервер правильно защищает эндпоинт от неавторизованных запросов.
     func testInfoWithoutToken() {
         let exp = expectation(description: "Info without token")
         ApiAPI.apiInfoRetrieve { data, error in

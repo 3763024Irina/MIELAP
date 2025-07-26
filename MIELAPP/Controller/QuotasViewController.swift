@@ -181,16 +181,39 @@ final class QuotasViewController: UIViewController, UINavigationControllerDelega
     }
     
     private func fetchQuotas(for year: Int) {
+        print(">>> Загружаем квоты для года:", year)
+
+        // --- Сырой запрос для проверки ---
+        if let token = UserDefaults.standard.string(forKey: "authToken") {
+            let urlString = "\(OpenAPIClientAPI.basePath)/api/supervisor/statistic/quotas/?year=\(year)"
+            guard let url = URL(string: urlString) else { return }
+            var request = URLRequest(url: url)
+            request.addValue("Token \(token)", forHTTPHeaderField: "Authorization")
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Ошибка ручного запроса:", error)
+                    return
+                }
+                if let data = data {
+                    print("RAW response:", String(data: data, encoding: .utf8) ?? "nil")
+                }
+            }.resume()
+        }
+
+        // --- Обычный вызов API ---
         ApiAPI.apiSupervisorStatisticQuotasList(year: year) { [weak self] data, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self?.showAlert(title: "Ошибка", message: error.localizedDescription)
                 }
+                print(">>> Ответ API:", data ?? [], "Ошибка:", error ?? "нет")
                 self?.quotaStats = data ?? []
                 self?.tableView.reloadData()
             }
         }
     }
+
     
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
