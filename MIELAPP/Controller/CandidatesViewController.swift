@@ -69,7 +69,7 @@ final class CandidatesViewController: UIViewController {
         OpenAPIClientAPI.customHeaders["Authorization"] = "Token \(token)"
         
         // 2. Подключаем UI
-        setupChatButton()
+       // setupChatButton()
         setupUI()
         setupHeaderCallbacks()
         
@@ -83,7 +83,7 @@ final class CandidatesViewController: UIViewController {
     @objc private func showFilterScreen() {
         let filterVC = CandidateFilterViewController()
         filterVC.delegate = self
-        filterVC.modalPresentationStyle = .formSheet // Можно .automatic или .overFullScreen, если хочешь
+        filterVC.modalPresentationStyle = .automatic // Можно .automatic или .overFullScreen, если хочешь
         present(filterVC, animated: true)
     }
     
@@ -278,9 +278,6 @@ final class CandidatesViewController: UIViewController {
         ])
     }
 
-
-
-
     private func setupHeaderCallbacks() {
         headerView.onNotifications = { [weak self] in
             self?.showInfoAlert(title: "Уведомления", message: "Нет новых уведомлений")
@@ -308,8 +305,6 @@ final class CandidatesViewController: UIViewController {
         }
     }
 
-
-    
     // Универсальный инфо-алерт:
     private func showInfoAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -382,6 +377,7 @@ final class CandidatesViewController: UIViewController {
                     self.candidates = infos         // Отображаемые (может быть отфильтровано)
                     self.tableView.reloadData()
                 } catch {
+                    print("Raw JSON:", String(data: data, encoding: .utf8) ?? "nil")
                     print("Decode raw error:", error)
                     print("Raw data:", String(data: data, encoding: .utf8) ?? "nil")
                 }

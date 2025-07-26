@@ -26,7 +26,6 @@
 		8C4CACB82E25758300A0E713 /* InviteCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACB72E25758300A0E713 /* InviteCandidate.swift */; };
 		8C4CACBA2E2575D700A0E713 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACB92E2575D700A0E713 /* InvitationCell.swift */; };
 		8C4CACBE2E26856A00A0E713 /* ApiAPI+GetLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4CACBD2E26856A00A0E713 /* ApiAPI+GetLink.swift */; };
-		8C7AFDD52E2ECD94007BC76C /* OpenAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */; };
 		8C7AFDD72E2ECD99007BC76C /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD62E2ECD99007BC76C /* AnyCodable */; };
 		8C7AFDD92E2ECE55007BC76C /* OpenAPIClient in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDD82E2ECE55007BC76C /* OpenAPIClient */; };
 		8C7AFDDB2E2ECE5B007BC76C /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C7AFDDA2E2ECE5B007BC76C /* AnyCodable */; };
@@ -109,7 +108,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8C7AFDD72E2ECD99007BC76C /* AnyCodable in Frameworks */,
-				8C7AFDD52E2ECD94007BC76C /* OpenAPIClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,9 +211,9 @@
 				8C3A23772E22FE4800A21B8A /* LoginViewController.swift */,
 				8C0805382E2FCECF002E93BA /* GreetingControllerView.swift */,
 				8C3A236F2E22FCE700A21B8A /* CandidatesViewController.swift */,
+				8C9891A02E23A86C00585415 /* CandidateCell.swift */,
 				8C0C6BF42E302E5E003703A0 /* CandidateFilterViewController.swift */,
 				8C3A23712E22FCFE00A21B8A /* FavoritesViewController.swift */,
-				8C9891A02E23A86C00585415 /* CandidateCell.swift */,
 				8C9891952E23119000585415 /* MainTabBarController.swift */,
 				8C3A23732E22FD0C00A21B8A /* InvitationsViewController .swift */,
 				8C4CACB92E2575D700A0E713 /* InvitationCell.swift */,
@@ -277,7 +275,6 @@
 			);
 			name = MIELAPPTests;
 			packageProductDependencies = (
-				8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */,
 				8C7AFDD62E2ECD99007BC76C /* AnyCodable */,
 			);
 			productName = MIELAPPTests;
@@ -792,10 +789,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8C7AFDD42E2ECD94007BC76C /* OpenAPIClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = OpenAPIClient;
-		};
 		8C7AFDD62E2ECD99007BC76C /* AnyCodable */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */;

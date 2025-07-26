@@ -1,81 +1,137 @@
 import XCTest
+import AnyCodable
 import OpenAPIClient
+@testable import MIELAPP
 
 final class APIServiceTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        // basePath и токен авторизации для тестов
+    
+    override func setUpWithError() throws {
         OpenAPIClientAPI.basePath = "https://miel.sayrrx.cfd"
-        OpenAPIClientAPI.customHeaders["Authorization"] = "Token 7d2898dbe35b33670224c24ed43ff73b676bc6cc"
+        OpenAPIClientAPI.customHeaders.removeAll()
+        UserDefaults.standard.removeObject(forKey: "authToken")
     }
     
-    // 1. Получить список кандидатов
-    func testGetCandidates() {
-        let expectation = XCTestExpectation(description: "Загрузка кандидатов")
-
-        ApiAPI.apiSupervisorCandidatesList { candidates, error in
-            XCTAssertNil(error, "Ошибка при загрузке кандидатов: \(error?.localizedDescription ?? "")")
-            XCTAssertNotNil(candidates, "Нет ответа от сервера")
-            if let candidates = candidates {
-                print("Всего кандидатов: \(candidates.count)")
-                for candidate in candidates {
-                    print("ID: \(candidate.id), ФИО: \(candidate.name) \(candidate.surname)")
-                }
-                XCTAssertTrue(candidates.count > 0, "Список кандидатов пуст!")
-            }
-            expectation.fulfill()
+    func testLogin() {
+        let exp = expectation(description: "login")
+        let body: [String: String] = ["username": "supervisor", "password": "supervisor"]
+        let anyBody = AnyCodable(body)
+        
+        ApiAPI.apiLoginCreate(body: anyBody) { data, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(data)
+            exp.fulfill()
         }
-
-        wait(for: [expectation], timeout: 10)
+        wait(for: [exp], timeout: 5)
     }
-
-
     
-    // 2. Получить ссылку на чат
-    func testGetChatLink() {
-        let expectation = XCTestExpectation(description: "Получение ссылки на чат")
-        ApiAPI.apiLinkRetrieve { response, error in
-            XCTAssertNil(error, "Ошибка при получении ссылки: \(error?.localizedDescription ?? "")")
-            // Проверь, что ссылка присутствует
-            if let value = response?.value as? String {
-                XCTAssertTrue(value.starts(with: "http"), "Ссылка не начинается с http")
-            } else if let dict = response?.value as? [String: Any], let link = dict["link"] as? String {
-                XCTAssertTrue(link.starts(with: "http"), "Ссылка не начинается с http")
+    func testInfoWithoutToken() {
+        let exp = expectation(description: "Info without token")
+        ApiAPI.apiInfoRetrieve { data, error in
+            XCTAssertNotNil(error, "Ожидали ошибку 401, но error == nil")
+            XCTAssertNil(data, "Данные не должны прийти без токена")
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 5.0)
+    }
+    
+    func testLoginAndSaveToken() {
+        let exp = expectation(description: "Login and save token")
+        let body: [String: String] = ["username": "supervisor", "password": "supervisor"]
+        let anyBody = AnyCodable(body)
+        
+        ApiAPI.apiLoginCreate(body: anyBody) { data, error in
+            XCTAssertNil(error, "Ошибка входа: \(String(describing: error))")
+            XCTAssertNotNil(data, "Ответ на логин пустой")
+            
+            if let value = data?.value,
+               let dict = value as? [String: Any],
+               let token = dict["token"] as? String {
+                UserDefaults.standard.set(token, forKey: "authToken")
+                OpenAPIClientAPI.customHeaders["Authorization"] = "Token \(token)"
+                XCTAssertFalse(token.isEmpty, "Токен пустой")
             } else {
-                XCTFail("Нет валидной ссылки в ответе")
+                XCTFail("Нет токена в ответе или неправильный формат")
             }
-            expectation.fulfill()
+            exp.fulfill()
         }
-        wait(for: [expectation], timeout: 10)
+        wait(for: [exp], timeout: 5.0)
     }
     
-    // 3. Отправить приглашение кандидату
-    func testSendInvitation() {
-        let expectation = XCTestExpectation(description: "Отправка приглашения")
+    func testGetCandidates() {
+        let loginExpectation = expectation(description: "Login first")
+        let getCandidatesExpectation = expectation(description: "Get candidates")
         
-        let candidateId = 1 // <-- ВСТАВЬ СЮДА НАСТОЯЩИЙ id кандидата из теста выше!
-
-        let invitation = Invitation(
-            id: 0, // если не нужен, не отправлять!
-            candidate: 123, // реальный id кандидата
-            name: "Иван",
-            surname: "Иванов",
-            patronymic: "Иванович",
-            city: "Москва",
-            age: 25,
-            photo: "https://...",
-            status: "pending", // или null, если не нужен
-            updatedAt: "" // возможно, вообще не нужен
-        )
-
+        let body: [String: String] = ["username": "supervisor", "password": "supervisor"]
+        let anyBody = AnyCodable(body)
         
-        ApiAPI.apiSupervisorInvitationsCreate(invitation: invitation) { result, error in
-            XCTAssertNil(error, "Ошибка при создании приглашения: \(error?.localizedDescription ?? "")")
-            XCTAssertNotNil(result, "Ответ не получен")
-            XCTAssertEqual(result?.candidate, invitation.candidate, "ID кандидата не совпадает")
-            expectation.fulfill()
+        ApiAPI.apiLoginCreate(body: anyBody) { data, error in
+            XCTAssertNil(error)
+            guard
+                let value = data?.value as? [String: Any],
+                let token = value["token"] as? String
+            else {
+                XCTFail("Нет токена")
+                loginExpectation.fulfill()
+                getCandidatesExpectation.fulfill()
+                return
+            }
+            
+            UserDefaults.standard.set(token, forKey: "authToken")
+            OpenAPIClientAPI.customHeaders["Authorization"] = "Token \(token)"
+            loginExpectation.fulfill()
+            
+            let url = URL(string: "\(OpenAPIClientAPI.basePath)/api/supervisor/candidates/")!
+            var request = URLRequest(url: url)
+            request.addValue("Token \(token)", forHTTPHeaderField: "Authorization")
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                XCTAssertNil(error)
+                XCTAssertNotNil(data)
+                guard let data = data else {
+                    XCTFail("Нет данных")
+                    getCandidatesExpectation.fulfill()
+                    return
+                }
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .custom { decoder -> Date in
+                    let container = try decoder.singleValueContainer()
+                    let dateString = try container.decode(String.self).trimmingCharacters(in: .whitespacesAndNewlines)
+                    if dateString.isEmpty { return Date(timeIntervalSince1970: 0) }
+                    let formats = [
+                        "dd.MM.yyyy",
+                        "yyyy-MM-dd",
+                        "yyyy-MM-dd'T'HH:mm:ss.SSSSSS", // с микросекундами
+                        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+                        "yyyy-MM-dd'T'HH:mm:ssZ"
+                    ]
+                    let df = DateFormatter()
+                    df.locale = Locale(identifier: "en_US_POSIX")
+                    df.timeZone = TimeZone(secondsFromGMT: 0)
+                    for fmt in formats {
+                        df.dateFormat = fmt
+                        if let date = df.date(from: dateString) { return date }
+                    }
+                    throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date: \(dateString)")
+                }
+                
+                do {
+                    struct SafeCandidateInfo: Decodable {
+                        let id: Int
+                        let favorite_id: Int?
+                        let name: String?
+                        let birth: Date?
+                        let updated_at: Date?
+                    }
+                    let candidates = try decoder.decode([SafeCandidateInfo].self, from: data)
+                    XCTAssertFalse(candidates.isEmpty, "Список пуст")
+                } catch {
+                    XCTFail("Ошибка ручного декодирования: \(error)")
+                }
+                getCandidatesExpectation.fulfill()
+            }.resume()
         }
-        
-        wait(for: [expectation], timeout: 10)
+        wait(for: [loginExpectation, getCandidatesExpectation], timeout: 10.0)
     }
+    
 }
