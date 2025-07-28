@@ -1,6 +1,7 @@
 import UIKit
 import OpenAPIClient
 import AnyCodable
+import SnapKit
 
 final class SupervisorHeaderView: UIView {
     // MARK: — UI Elements
@@ -17,22 +18,20 @@ final class SupervisorHeaderView: UIView {
     private var quotasCount: Int = 0
     private var invitationsCount: Int = 0
 
-    // MARK: — Callbacks (оставлены если нужно расширить)
+    // MARK: — Callbacks
     public var onNotifications: (() -> Void)?
     public var onLogout: (() -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
-        setup()
+        setupUI()
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        translatesAutoresizingMaskIntoConstraints = false
-        setup()
+        setupUI()
     }
 
-    private func setup() {
+    private func setupUI() {
         backgroundColor = .white
         layer.cornerRadius = 18
         layer.shadowColor = UIColor.black.withAlphaComponent(0.08).cgColor
@@ -40,7 +39,6 @@ final class SupervisorHeaderView: UIView {
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 4
         
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 22
         imageView.layer.masksToBounds = true
         imageView.backgroundColor = .white
@@ -48,26 +46,21 @@ final class SupervisorHeaderView: UIView {
         
         nameLabel.font = .boldSystemFont(ofSize: 15)
         nameLabel.textColor = .label
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         officeLabel.font = .systemFont(ofSize: 13, weight: .medium)
         officeLabel.textColor = .black
-        officeLabel.translatesAutoresizingMaskIntoConstraints = false
         officeLabel.isHidden = true
         
         dateLabel.font = .systemFont(ofSize: 12)
         dateLabel.textColor = .secondaryLabel
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
         
         notifyButton.setImage(UIImage(systemName: "bell"), for: .normal)
         notifyButton.tintColor = .black
         notifyButton.addTarget(self, action: #selector(notifyTapped), for: .touchUpInside)
-        notifyButton.translatesAutoresizingMaskIntoConstraints = false
         
         logoutButton.setImage(UIImage(systemName: "rectangle.portrait.and.arrow.right"), for: .normal)
         logoutButton.tintColor = .black
         logoutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
-        logoutButton.translatesAutoresizingMaskIntoConstraints = false
         
         quotasButton.layer.cornerRadius = 7
         quotasButton.layer.borderWidth = 2
@@ -76,7 +69,6 @@ final class SupervisorHeaderView: UIView {
         quotasButton.setTitleColor(UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1), for: .normal)
         quotasButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         quotasButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 28, bottom: 4, right: 28)
-        quotasButton.translatesAutoresizingMaskIntoConstraints = false
         quotasButton.addTarget(self, action: #selector(quotasTapped), for: .touchUpInside)
 
         invitesButton.layer.cornerRadius = 7
@@ -84,7 +76,6 @@ final class SupervisorHeaderView: UIView {
         invitesButton.setTitleColor(UIColor(red: 156/255, green: 199/255, blue: 0/255, alpha: 1), for: .normal)
         invitesButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         invitesButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 28, bottom: 4, right: 28)
-        invitesButton.translatesAutoresizingMaskIntoConstraints = false
         invitesButton.addTarget(self, action: #selector(invitesTapped), for: .touchUpInside)
         invitesButton.layer.borderWidth = 1
         invitesButton.layer.borderColor = UIColor(red: 156/255, green: 199/255, blue: 0/255, alpha: 1).cgColor
@@ -93,37 +84,33 @@ final class SupervisorHeaderView: UIView {
         infoStack.axis = .vertical
         infoStack.alignment = .leading
         infoStack.spacing = 2
-        infoStack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let headerRow = UIStackView(arrangedSubviews: [imageView, infoStack, notifyButton, logoutButton])
         headerRow.axis = .horizontal
         headerRow.alignment = .center
         headerRow.spacing = 12
-        headerRow.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let countersStack = UIStackView(arrangedSubviews: [quotasButton, invitesButton])
         countersStack.axis = .horizontal
         countersStack.spacing = 10
         countersStack.distribution = .fillEqually
-        countersStack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         addSubview(headerRow)
         addSubview(countersStack)
         
-        NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalToConstant: 44),
-            imageView.heightAnchor.constraint(equalToConstant: 44),
-            
-            headerRow.topAnchor.constraint(equalTo: topAnchor, constant: 12),
-            headerRow.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            headerRow.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            
-            countersStack.topAnchor.constraint(equalTo: headerRow.bottomAnchor, constant: 10),
-            countersStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            countersStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            countersStack.heightAnchor.constraint(equalToConstant: 38),
-            countersStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10)
-        ])
+        imageView.snp.makeConstraints { make in
+            make.width.height.equalTo(44)
+        }
+        headerRow.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(12)
+            make.leading.trailing.equalToSuperview().inset(16)
+        }
+        countersStack.snp.makeConstraints { make in
+            make.top.equalTo(headerRow.snp.bottom).offset(10)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(38)
+            make.bottom.equalToSuperview().inset(10)
+        }
     }
 
     func configure(fullName: String, date: String, photoURL: URL?, office: String = "", quotas: Int = 0, invitations: Int = 0) {

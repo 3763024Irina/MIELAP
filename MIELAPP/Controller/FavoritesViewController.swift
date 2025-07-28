@@ -62,7 +62,7 @@ final class FavoritesViewController: UIViewController, UITableViewDelegate {
         requestQuotaButton.layer.borderWidth = 1
         requestQuotaButton.layer.borderColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1).cgColor
         requestQuotaButton.translatesAutoresizingMaskIntoConstraints = false
-        requestQuotaButton.addTarget(self, action: #selector(showQuotasScreen), for: .touchUpInside)
+       
 
         let rowStack = UIStackView(arrangedSubviews: [titleLabel, UIView(), requestQuotaButton])
         rowStack.axis = .horizontal

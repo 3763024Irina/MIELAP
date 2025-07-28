@@ -1,8 +1,10 @@
 import UIKit
+import SnapKit
 import OpenAPIClient
 
 final class InvitationCell: UITableViewCell {
     static let reuseId = "InvitationCell"
+    
     private let avatar = UIImageView()
     private let fioLabel = UILabel()
     private let cityLabel = UILabel()
@@ -24,32 +26,28 @@ final class InvitationCell: UITableViewCell {
     private func setup() {
         selectionStyle = .none
         contentView.backgroundColor = .white
-
-        avatar.translatesAutoresizingMaskIntoConstraints = false
+        
+        // --- Аватар ---
         avatar.layer.cornerRadius = 20
         avatar.clipsToBounds = true
         avatar.backgroundColor = .systemGray5
         avatar.contentMode = .scaleAspectFill
         contentView.addSubview(avatar)
-        NSLayoutConstraint.activate([
-            avatar.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 0),
-            avatar.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            avatar.widthAnchor.constraint(equalToConstant: 40),
-            avatar.heightAnchor.constraint(equalToConstant: 40)
-        ])
-
-        // Горизонтальный стек: ФИО, ГОРОД, ВОЗРАСТ, СТАТУС, ДАТА
+        avatar.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)   // только для иконки!
+        }
+        
+        // --- Горизонтальный стек ---
         stack.axis = .horizontal
         stack.spacing = 0
         stack.distribution = .fill
-        stack.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: avatar.trailingAnchor),
-            stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            stack.topAnchor.constraint(equalTo: contentView.topAnchor),
-            stack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        ])
+        stack.snp.makeConstraints { make in
+            make.leading.equalTo(avatar.snp.trailing)
+            make.top.bottom.trailing.equalToSuperview()
+        }
 
         fioLabel.font = .boldSystemFont(ofSize: 14)
         fioLabel.numberOfLines = 2
@@ -58,19 +56,19 @@ final class InvitationCell: UITableViewCell {
         ageLabel.font = .systemFont(ofSize: 14)
         dateLabel.font = .systemFont(ofSize: 14)
 
-        let statusContainer = UIView()
-        statusDot.translatesAutoresizingMaskIntoConstraints = false
+        // --- Статус (точка) ---
         statusDot.layer.cornerRadius = 5
-        statusDot.widthAnchor.constraint(equalToConstant: 10).isActive = true
-        statusDot.heightAnchor.constraint(equalToConstant: 10).isActive = true
+        let statusContainer = UIView()
         statusContainer.addSubview(statusDot)
-        NSLayoutConstraint.activate([
-            statusDot.centerXAnchor.constraint(equalTo: statusContainer.centerXAnchor),
-            statusDot.centerYAnchor.constraint(equalTo: statusContainer.centerYAnchor),
-            statusContainer.widthAnchor.constraint(equalToConstant: 50)
-        ])
+        statusContainer.snp.makeConstraints { make in
+            make.width.equalTo(50) // только ширина
+        }
+        statusDot.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(10) // маленький кружок
+        }
 
-        // ⚡️ Колонки идут сразу друг за другом, без лишних отступов
+        // --- Добавление колонок ---
         stack.addArrangedSubview(makeLabelContainer(fioLabel, width: 130))
         stack.addArrangedSubview(makeLabelContainer(cityLabel, width: 80))
         stack.addArrangedSubview(makeLabelContainer(ageLabel, width: 70))
@@ -80,34 +78,13 @@ final class InvitationCell: UITableViewCell {
 
     private func makeLabelContainer(_ label: UILabel, width: CGFloat) -> UIView {
         let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-        container.widthAnchor.constraint(equalToConstant: width).isActive = true
-        label.translatesAutoresizingMaskIntoConstraints = false
+        container.snp.makeConstraints { make in
+            make.width.equalTo(width)   // ширина фиксирована
+        }
         container.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 0),
-            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: 0),
-            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 0),
-            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: 0)
-        ])
-        return container
-    }
-    
-   
-
-
-    private func makeLabelContainer(label: UILabel, width: CGFloat) -> UIView {
-        let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-        container.widthAnchor.constraint(equalToConstant: width).isActive = true
-        label.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: container.topAnchor),
-            label.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: container.trailingAnchor)
-        ])
+        label.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         return container
     }
 
@@ -119,7 +96,7 @@ final class InvitationCell: UITableViewCell {
         ageLabel.text = "\(invitation.age)"
         statusDot.backgroundColor = color(for: invitation.status ?? "invited")
         dateLabel.text = invitation.updatedAt.flatMap { formattedDate($0) } ?? "-"
-
+        
         if let photo = invitation.photo, !photo.isEmpty, let url = URL(string: photo) {
             avatar.image = UIImage(systemName: "person.crop.circle")
             URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in

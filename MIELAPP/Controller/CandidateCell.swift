@@ -1,4 +1,5 @@
 import UIKit
+import SnapKit
 import OpenAPIClient
 
 protocol CandidateCellDelegate: AnyObject {
@@ -23,6 +24,7 @@ final class CandidateCell: UITableViewCell {
     private let achLeftStack = UIStackView()
     private let achRightStack = UIStackView()
     private let achievementsWrapper = UIStackView()
+    
     let inviteButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitle("Пригласить", for: .normal)
@@ -31,9 +33,9 @@ final class CandidateCell: UITableViewCell {
         btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         btn.layer.cornerRadius = 16
         btn.clipsToBounds = true
-        btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
+    
     private var resumeURL: URL?
     private var avatarTask: URLSessionDataTask?
     
@@ -50,101 +52,87 @@ final class CandidateCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         avatarTask?.cancel()
-        avatar.image = UIImage(named: "avatar_placeholder") // если нет фото
+        avatar.image = UIImage(named: "avatar_placeholder")
         heartButton.isSelected = false
         achLeftStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         achRightStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         coursesStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
+    
     private func setupActions() {
         heartButton.addTarget(self, action: #selector(toggleFavorite), for: .touchUpInside)
         resumeButton.addTarget(self, action: #selector(openResume), for: .touchUpInside)
         inviteButton.addTarget(self, action: #selector(inviteTapped), for: .touchUpInside)
     }
+    
     private func setupSubviews() {
-        // СТИЛЬ КАРТОЧКИ
-        contentView.backgroundColor = UIColor(red: 246/255, green: 246/255, blue: 247/255, alpha: 1) // #F6F6F7
+        // Стиль карточки
+        contentView.backgroundColor = UIColor(red: 246/255, green: 246/255, blue: 247/255, alpha: 1)
         contentView.layer.cornerRadius = 16
         contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor(red: 0.792, green: 0.796, blue: 0.808, alpha: 1).cgColor // #CACBCE
+        contentView.layer.borderColor = UIColor(red: 0.792, green: 0.796, blue: 0.808, alpha: 1).cgColor
         contentView.layer.masksToBounds = true
         
-        // АВАТАР
-        avatar.translatesAutoresizingMaskIntoConstraints = false
         avatar.layer.cornerRadius = 24
         avatar.clipsToBounds = true
         avatar.backgroundColor = .systemGray5
-        NSLayoutConstraint.activate([
-            avatar.widthAnchor.constraint(equalToConstant: 48),
-            avatar.heightAnchor.constraint(equalToConstant: 48)
-        ])
+        avatar.snp.makeConstraints { make in
+            make.width.height.equalTo(48)
+        }
         
-        // СЕРДЕЧКО
         heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
         heartButton.setImage(UIImage(systemName: "heart.fill"), for: .selected)
         heartButton.tintColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1)
-        heartButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            heartButton.widthAnchor.constraint(equalToConstant: 24),
-            heartButton.heightAnchor.constraint(equalToConstant: 24)
-        ])
+        heartButton.snp.makeConstraints { make in
+            make.width.height.equalTo(24)
+        }
         
-        // ИМЯ + ВОЗРАСТ + ГОРОД
         nameAgeCity.font = .systemFont(ofSize: 15, weight: .semibold)
         nameAgeCity.numberOfLines = 2
         nameAgeCity.textColor = .black
         
-        // Резюме (если есть)
         resumeButton.setTitle("Ссылка на резюме", for: .normal)
         resumeButton.setTitleColor(UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1), for: .normal)
         resumeButton.titleLabel?.font = .systemFont(ofSize: 15)
         resumeButton.isHidden = true
         
-        // ОБРАЗОВАНИЕ
         officeLabel.font = .systemFont(ofSize: 15, weight: .medium)
         officeLabel.textColor = .black
         
-        // КУРСЫ
         coursesStack.axis = .vertical
         coursesStack.spacing = 2
         
-        // ДОСТИЖЕНИЯ
         achievementsTitle.text = "Достижения"
         achievementsTitle.font = .systemFont(ofSize: 16, weight: .bold)
         achLeftStack.axis = .vertical
         achLeftStack.spacing = 2
         achRightStack.axis = .vertical
         achRightStack.spacing = 2
+        
         achievementsWrapper.axis = .horizontal
         achievementsWrapper.spacing = 30
         achievementsWrapper.addArrangedSubview(achLeftStack)
         achievementsWrapper.addArrangedSubview(achRightStack)
         
-        // КНОПКА "ПРИГЛАСИТЬ"
         let buttonContainer = UIView()
-        buttonContainer.translatesAutoresizingMaskIntoConstraints = false
         buttonContainer.addSubview(inviteButton)
-        NSLayoutConstraint.activate([
-            inviteButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
-            inviteButton.topAnchor.constraint(equalTo: buttonContainer.topAnchor),
-            inviteButton.bottomAnchor.constraint(equalTo: buttonContainer.bottomAnchor),
-            inviteButton.widthAnchor.constraint(equalToConstant: 160),
-            inviteButton.heightAnchor.constraint(equalToConstant: 44)
-        ])
+        inviteButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+            make.width.equalTo(160)
+            make.height.equalTo(44)
+        }
         
-        // ВЕРХНЯЯ СТРОКА: аватар - ФИО - сердечко
         let headerRow = UIStackView(arrangedSubviews: [avatar, nameAgeCity, UIView(), heartButton])
         headerRow.axis = .horizontal
         headerRow.alignment = .center
         headerRow.spacing = 12
         
-        // Вторая строка: образование и резюме
         let infoRow = UIStackView(arrangedSubviews: [officeLabel, UIView(), resumeButton])
         infoRow.axis = .horizontal
         infoRow.alignment = .center
         infoRow.spacing = 8
         
-        // Основной стек для всей ячейки
         let mainStack = UIStackView(arrangedSubviews: [
             headerRow,
             infoRow,
@@ -155,17 +143,14 @@ final class CandidateCell: UITableViewCell {
         ])
         mainStack.axis = .vertical
         mainStack.spacing = 8
-        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        
         contentView.addSubview(mainStack)
-        NSLayoutConstraint.activate([
-            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
-        ])
+        mainStack.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(16)
+        }
     }
     
-        func configure(with c: CandidateInfo) {
+    func configure(with c: CandidateInfo) {
         avatarTask?.cancel()
         if let s = c.photo, !s.isEmpty, let url = URL(string: s) {
             avatarTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
@@ -174,7 +159,7 @@ final class CandidateCell: UITableViewCell {
             }
             avatarTask?.resume()
         } else {
-            avatar.image = UIImage(named: "avatar_placeholder") // <- твоя маска в assets
+            avatar.image = UIImage(named: "avatar_placeholder")
         }
         
         heartButton.isSelected = c.isFavorite
@@ -194,7 +179,6 @@ final class CandidateCell: UITableViewCell {
         
         officeLabel.text = c.education ?? ""
         
-        // --- Курсы ---
         coursesStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let square = "\u{25A0}"
         c.courses.forEach {
@@ -206,7 +190,6 @@ final class CandidateCell: UITableViewCell {
             coursesStack.addArrangedSubview(lbl)
         }
         
-        // --- Достижения ---
         achLeftStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         achRightStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let achTuples: [(String, Int?)] = [
@@ -239,7 +222,6 @@ final class CandidateCell: UITableViewCell {
         }
         achievementsTitle.isHidden = false
         
-        // --- Кнопка "Пригласить"/"Отправлено" ---
         if c.isInvited {
             inviteButton.setTitle("Отправлено", for: .normal)
             inviteButton.isEnabled = false
@@ -250,7 +232,6 @@ final class CandidateCell: UITableViewCell {
             inviteButton.alpha = 1.0
         }
     }
-
     
     @objc private func inviteTapped() {
         inviteDelegate?.candidateCellDidTapInvite(self)

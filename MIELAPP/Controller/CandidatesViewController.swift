@@ -174,24 +174,40 @@ final class CandidatesViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true)
     }
+    
+    
     private func setupUI() {
         navigationController?.setNavigationBarHidden(true, animated: false)
 
-        headerView.translatesAutoresizingMaskIntoConstraints = false
+        // --- Header
+        view.addSubview(headerView)
+        headerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.equalToSuperview()
+        }
+
+        // --- Section header container
         let sectionHeaderContainer = UIView()
-        sectionHeaderContainer.translatesAutoresizingMaskIntoConstraints = false
         sectionHeaderContainer.backgroundColor = .white
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(sectionHeaderContainer)
+        sectionHeaderContainer.snp.makeConstraints { make in
+            make.top.equalTo(headerView.snp.bottom)
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(72)
+        }
+
+        // --- Table
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(CandidateCell.self, forCellReuseIdentifier: CandidateCell.reuseId)
         tableView.separatorStyle = .none
-
-        view.addSubview(headerView)
-        view.addSubview(sectionHeaderContainer)
         view.addSubview(tableView)
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(sectionHeaderContainer.snp.bottom)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
 
-        // --- Заголовок "Витрина кандидатов" + "Запросить квоты" ---
+        // --- Заголовок "Витрина кандидатов" + "Запросить квоты"
         let titleLabel = UILabel()
         titleLabel.text = "Витрина кандидатов"
         if let ptSansBold = UIFont(name: "PTSans-Bold", size: 20) {
@@ -200,10 +216,7 @@ final class CandidatesViewController: UIViewController {
             titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
         }
         titleLabel.textColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1)
-        titleLabel.backgroundColor = .clear
-        titleLabel.textAlignment = .left
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let requestQuotaButton = UIButton(type: .system)
         requestQuotaButton.setTitle("Запросить квоты", for: .normal)
@@ -211,72 +224,57 @@ final class CandidatesViewController: UIViewController {
             requestQuotaButton.titleLabel?.font = ptSansFont
         }
         requestQuotaButton.setTitleColor(.black, for: .normal)
-        requestQuotaButton.backgroundColor = UIColor.white
+        requestQuotaButton.backgroundColor = .white
         requestQuotaButton.layer.cornerRadius = 8
-        requestQuotaButton.contentEdgeInsets = UIEdgeInsets(top: 3, left: 18, bottom: 3, right: 18)
         requestQuotaButton.layer.borderWidth = 1
         requestQuotaButton.layer.borderColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1).cgColor
-        requestQuotaButton.translatesAutoresizingMaskIntoConstraints = false
-        // requestQuotaButton.addTarget(self, action: #selector(showQuotasScreen), for: .touchUpInside)
+        requestQuotaButton.contentEdgeInsets = UIEdgeInsets(top: 3, left: 18, bottom: 3, right: 18)
+        sectionHeaderContainer.addSubview(requestQuotaButton)
+        requestQuotaButton.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.width.greaterThanOrEqualTo(100)
+        }
 
         let rowStack = UIStackView(arrangedSubviews: [titleLabel, UIView(), requestQuotaButton])
         rowStack.axis = .horizontal
         rowStack.alignment = .center
         rowStack.spacing = 8
-        rowStack.translatesAutoresizingMaskIntoConstraints = false
-
         sectionHeaderContainer.addSubview(rowStack)
-        NSLayoutConstraint.activate([
-            rowStack.topAnchor.constraint(equalTo: sectionHeaderContainer.topAnchor, constant: 8),
-            rowStack.leadingAnchor.constraint(equalTo: sectionHeaderContainer.leadingAnchor, constant: 16),
-            rowStack.trailingAnchor.constraint(equalTo: sectionHeaderContainer.trailingAnchor, constant: -16)
-        ])
+        rowStack.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.leading.trailing.equalToSuperview().inset(16)
+        }
 
-        // --- Кнопка "Фильтр" справа ---
+        // --- Кнопка "Фильтр"
         filterButton.setTitle("Фильтр", for: .normal)
         let filterIcon = UIImage(systemName: "line.3.horizontal.decrease.circle")
         filterButton.setImage(filterIcon, for: .normal)
         filterButton.tintColor = .black
         filterButton.setTitleColor(.black, for: .normal)
-        filterButton.backgroundColor = UIColor.white
+        filterButton.backgroundColor = .white
         filterButton.layer.cornerRadius = 8
-        filterButton.contentEdgeInsets = UIEdgeInsets(top: 3, left: 18, bottom: 3, right: 18)
         filterButton.layer.borderWidth = 1
         filterButton.layer.borderColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1).cgColor
-        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        filterButton.contentEdgeInsets = UIEdgeInsets(top: 3, left: 18, bottom: 3, right: 18)
         filterButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
+        sectionHeaderContainer.addSubview(filterButton)
+        filterButton.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.width.greaterThanOrEqualTo(100)
+        }
 
         let filterStack = UIStackView(arrangedSubviews: [UIView(), filterButton])
         filterStack.axis = .horizontal
-        filterStack.backgroundColor = .white
         filterStack.alignment = .center
-        filterStack.translatesAutoresizingMaskIntoConstraints = false
-
         sectionHeaderContainer.addSubview(filterStack)
-        NSLayoutConstraint.activate([
-            filterStack.topAnchor.constraint(equalTo: rowStack.bottomAnchor, constant: 6),
-            filterStack.leadingAnchor.constraint(equalTo: sectionHeaderContainer.leadingAnchor, constant: 16),
-            filterStack.trailingAnchor.constraint(equalTo: sectionHeaderContainer.trailingAnchor, constant: -16),
-            filterStack.bottomAnchor.constraint(equalTo: sectionHeaderContainer.bottomAnchor, constant: -8),
-            filterButton.heightAnchor.constraint(equalToConstant: 32)
-        ])
-
-        NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-
-            sectionHeaderContainer.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            sectionHeaderContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            sectionHeaderContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            sectionHeaderContainer.heightAnchor.constraint(equalToConstant: 72), // под фильтр
-
-            tableView.topAnchor.constraint(equalTo: sectionHeaderContainer.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        filterStack.snp.makeConstraints { make in
+            make.top.equalTo(rowStack.snp.bottom).offset(6)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().offset(-8)
+        }
     }
+
+
 
     private func setupHeaderCallbacks() {
         headerView.onNotifications = { [weak self] in

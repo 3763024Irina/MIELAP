@@ -36,6 +36,7 @@
 		8C9891992E23157200585415 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 8C9891982E23157200585415 /* AnyCodable */; settings = {ATTRIBUTES = (Required, ); }; };
 		8C98919D2E23A02900585415 /* SupervisorHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C98919C2E23A02900585415 /* SupervisorHeaderView.swift */; };
 		8C9891A12E23A86C00585415 /* CandidateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9891A02E23A86C00585415 /* CandidateCell.swift */; };
+		8CA624BD2E37DD790094DDE8 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8CA624BC2E37DD790094DDE8 /* SnapKit */; };
 		ACF64CE501B6B30A616C8AE1 /* Pods_MIELAPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D85F03DEC2B0CCBBCF2A2EE7 /* Pods_MIELAPP.framework */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +99,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8C9891942E23108700585415 /* OpenAPIClient in Frameworks */,
+				8CA624BD2E37DD790094DDE8 /* SnapKit in Frameworks */,
 				8C9891992E23157200585415 /* AnyCodable in Frameworks */,
 				ACF64CE501B6B30A616C8AE1 /* Pods_MIELAPP.framework in Frameworks */,
 			);
@@ -255,6 +257,7 @@
 			packageProductDependencies = (
 				8C9891932E23108700585415 /* OpenAPIClient */,
 				8C9891982E23157200585415 /* AnyCodable */,
+				8CA624BC2E37DD790094DDE8 /* SnapKit */,
 			);
 			productName = MIELAPP;
 			productReference = 8C3A23352E22AA3600A21B8A /* MIELAPP.app */;
@@ -337,6 +340,7 @@
 			mainGroup = 8C3A232C2E22AA3600A21B8A;
 			packageReferences = (
 				8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */,
+				8CA624BB2E37DD790094DDE8 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = 8C3A23362E22AA3600A21B8A /* Products */;
 			projectDirPath = "";
@@ -786,6 +790,14 @@
 				minimumVersion = 0.6.1;
 			};
 		};
+		8CA624BB2E37DD790094DDE8 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -811,6 +823,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8C9891972E23157100585415 /* XCRemoteSwiftPackageReference "AnyCodable" */;
 			productName = AnyCodable;
+		};
+		8CA624BC2E37DD790094DDE8 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8CA624BB2E37DD790094DDE8 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 
