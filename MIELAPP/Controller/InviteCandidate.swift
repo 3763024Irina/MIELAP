@@ -1,28 +1,20 @@
 import OpenAPIClient
+import OpenAPIClient
 
 extension Invitation {
-    init(
-        candidate: Int,
-        name: String,
-        surname: String,
-        patronymic: String? = nil,
-        city: String? = nil,
-        age: Int,
-        photo: String? = nil,
-        status: String? = nil,
-        updatedAt: String? = nil
-    ) {
+    /// Удобный инициализатор для создания приглашения из модели кандидата
+    init(from candidate: CandidateInfo) {
         self.init(
-            id: 0,  // или -1, если id не нужен, главное — Int!
-            candidate: candidate,
-            name: name,
-            surname: surname,
-            patronymic: patronymic ?? "", // заменяем nil на ""
-            city: city ?? "",
-            age: age,
-            photo: photo ?? "",
-            status: status ?? "",
-            updatedAt: updatedAt ?? ""
+            id: 0,                                // id присваивается сервером
+            candidate: candidate.id,
+            name: candidate.name,
+            surname: candidate.surname,
+            patronymic: candidate.patronymic ?? "",
+            city: candidate.city ?? "",
+            age: candidate.age,
+            photo: candidate.photo ?? "",
+            status: "pending",                    // начальный статус
+            updatedAt: ""                         // сервер заполнит
         )
     }
 }

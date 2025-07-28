@@ -453,9 +453,11 @@ final class CandidatesViewController: UIViewController {
         }
     }
     
+    /// Отправка приглашения кандидату
     func sendInvitation(for candidate: CandidateInfo, completion: @escaping (Result<Void, Error>) -> Void) {
+        // Формируем полный объект Invitation
         let invitation = Invitation(
-            id: 0,
+            id: 0,                                // сервер присвоит свой id
             candidate: candidate.id,
             name: candidate.name,
             surname: candidate.surname,
@@ -463,9 +465,10 @@ final class CandidatesViewController: UIViewController {
             city: candidate.city ?? "",
             age: candidate.age,
             photo: candidate.photo ?? "",
-            status: "pending",
-            updatedAt: ""
+            status: "pending",                    // новый статус
+            updatedAt: ""                         // сервер обновит дату
         )
+
         ApiAPI.apiSupervisorInvitationsCreate(invitation: invitation) { response, error in
             if let error = error {
                 completion(.failure(error))
@@ -474,6 +477,8 @@ final class CandidatesViewController: UIViewController {
             }
         }
     }
+
+
     @objc func inviteButtonTapped(_ sender: UIButton) {
         let index = sender.tag
         let candidate = candidates[index]
@@ -541,28 +546,31 @@ final class CandidatesViewController: UIViewController {
         }
     }
     // MARK: - CandidateCellDelegate (Invite)
-    extension CandidatesViewController: CandidateCellDelegate {
-        // Например, в методе делегата ячейки или при нажатии на "Пригласить"
-        // В вашем делегате или ViewController:
-        func candidateCellDidTapInvite(_ cell: CandidateCell) {
-            guard let indexPath = tableView.indexPath(for: cell) else { return }
-            let candidate = candidates[indexPath.row]
-            
-            sendInvitation(for: candidate) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success():
-                        self?.showAlert(title: "Успех", message: "Приглашение отправлено!")
-                        // Обновить список, чтобы кнопка стала неактивной:
-                        self?.fetchCandidates()
-                    case .failure(let error):
-                        self?.showAlert(title: "Ошибка", message: error.localizedDescription)
-                    }
+extension CandidatesViewController: CandidateCellDelegate {
+    func candidateCellDidTapInvite(_ cell: CandidateCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        var candidate = candidates[indexPath.row]
+        
+        sendInvitation(for: candidate) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    // Помечаем кандидата как приглашённого
+                    candidate.isInvited = true
+                    self?.candidates[indexPath.row] = candidate
+                    
+                    // Обновляем только одну ячейку
+                    self?.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    
+                    self?.showAlert(title: "Успех", message: "Приглашение отправлено!")
+                case .failure(let error):
+                    self?.showAlert(title: "Ошибка", message: error.localizedDescription)
                 }
             }
         }
-        
     }
+}
+
     // MARK: - FavoriteCellDelegate (Like/Unlike)
     extension CandidatesViewController: FavoriteCellDelegate {
         func candidateCell(_ cell: CandidateCell, didToggleFavorite isFavorite: Bool) {

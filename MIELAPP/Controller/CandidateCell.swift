@@ -165,22 +165,25 @@ final class CandidateCell: UITableViewCell {
         ])
     }
     
-    func configure(with c: CandidateInfo) {
+        func configure(with c: CandidateInfo) {
         avatarTask?.cancel()
         if let s = c.photo, !s.isEmpty, let url = URL(string: s) {
-            avatarTask = URLSession.shared.dataTask(with: url) { [weak self] data,_,_ in
+            avatarTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
                 guard let d = data, let img = UIImage(data: d) else { return }
                 DispatchQueue.main.async { self?.avatar.image = img }
             }
             avatarTask?.resume()
         } else {
-            avatar.image = UIImage(named: "avatar_placeholder") // <- твоя маска в assets (png/pdf/svg)
+            avatar.image = UIImage(named: "avatar_placeholder") // <- твоя маска в assets
         }
+        
         heartButton.isSelected = c.isFavorite
+        
         let fio = [c.surname, c.name, c.patronymic].compactMap { $0 }.joined(separator: " ")
         var details = ["\(c.age) года"]
         if let city = c.city, !city.isEmpty { details.append(city) }
         nameAgeCity.text = fio + "\n" + details.joined(separator: ", ")
+        
         if let link = c.resume, !link.isEmpty, let url = URL(string: link) {
             resumeURL = url
             resumeButton.isHidden = false
@@ -188,17 +191,22 @@ final class CandidateCell: UITableViewCell {
             resumeURL = nil
             resumeButton.isHidden = true
         }
+        
         officeLabel.text = c.education ?? ""
+        
+        // --- Курсы ---
         coursesStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let square = "\u{25A0}"
         c.courses.forEach {
             let lbl = UILabel()
             lbl.font = .systemFont(ofSize: 14)
             lbl.text = "\(square) \($0.name)"
-            lbl.textColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1) // #960047
+            lbl.textColor = UIColor(red: 150/255, green: 0, blue: 71/255, alpha: 1)
             lbl.numberOfLines = 0
             coursesStack.addArrangedSubview(lbl)
         }
+        
+        // --- Достижения ---
         achLeftStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         achRightStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let achTuples: [(String, Int?)] = [
@@ -230,9 +238,19 @@ final class CandidateCell: UITableViewCell {
             }
         }
         achievementsTitle.isHidden = false
-        inviteButton.isEnabled = !c.isInvited
-        inviteButton.alpha = c.isInvited ? 0.4 : 1.0
+        
+        // --- Кнопка "Пригласить"/"Отправлено" ---
+        if c.isInvited {
+            inviteButton.setTitle("Отправлено", for: .normal)
+            inviteButton.isEnabled = false
+            inviteButton.alpha = 0.5
+        } else {
+            inviteButton.setTitle("Пригласить", for: .normal)
+            inviteButton.isEnabled = true
+            inviteButton.alpha = 1.0
+        }
     }
+
     
     @objc private func inviteTapped() {
         inviteDelegate?.candidateCellDidTapInvite(self)

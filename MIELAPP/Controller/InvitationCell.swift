@@ -1,5 +1,6 @@
 import UIKit
 import OpenAPIClient
+
 final class InvitationCell: UITableViewCell {
     static let reuseId = "InvitationCell"
     private let avatar = UIImageView()
